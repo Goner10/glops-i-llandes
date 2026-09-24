@@ -8,12 +8,17 @@ import { withBase } from "../../lib/paths";
 interface Props {
   /** Remate bajo la barra: damero en la portada, doble filete en la carta. */
   strip?: "checker" | "rule";
+  /**
+   * Presentación compacta para la home: solo el logo gráfico, sin repetir el nombre,
+   * que ya lleva el H1 del hero. En páginas interiores el nombre acompaña al logo.
+   */
+  compact?: boolean;
 }
 
-const { strip = "checker" } = Astro.props;
+const { strip = "checker", compact = false } = Astro.props;
 ---
 
-<header class="site-header">
+<header class:list={["site-header", { "site-header--compact": compact }]} data-site-header>
   <div class="bar">
     <a class="brand" href={withBase("/")}>
       <Image
@@ -23,7 +28,7 @@ const { strip = "checker" } = Astro.props;
         sizes="44px"
         loading="eager"
       />
-      <span class="brand__name">Glops<span aria-hidden="true"> i </span>Llandes</span>
+      {!compact && <span class="brand__name">Glops<span aria-hidden="true"> i </span>Llandes</span>}
     </a>
 
     <nav class="nav-desktop" aria-label="Navegación principal">
@@ -47,13 +52,18 @@ const { strip = "checker" } = Astro.props;
         aria-controls="menu-movil"
         data-menu-toggle
       >
-        <span class="burger__lines" aria-hidden="true"></span>
-        <span class="visually-hidden">Abrir menú</span>
+        <span class="burger__lines" aria-hidden="true">
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+        </span>
+        <span class="visually-hidden" data-menu-label>Abrir menú</span>
       </button>
     </div>
   </div>
 
- 
+  <!-- Velo sobre la página mientras el menú está abierto; tocarlo cuenta como «fuera». -->
+  <div class="scrim" hidden data-menu-scrim aria-hidden="true"></div>
 
   <div class="panel" id="menu-movil" hidden data-menu-panel>
     <nav aria-label="Navegación móvil">
@@ -84,6 +94,9 @@ const { strip = "checker" } = Astro.props;
   }
 
   .bar {
+    /* Por encima del velo y del panel, para que el botón siga accesible con el menú abierto. */
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: var(--space-m);
@@ -92,6 +105,7 @@ const { strip = "checker" } = Astro.props;
     min-height: var(--header-height);
     margin-inline: auto;
     padding: 0.5rem var(--gutter);
+    background: var(--color-paper);
   }
 
   .brand {
@@ -114,6 +128,15 @@ const { strip = "checker" } = Astro.props;
     letter-spacing: 0.02em;
     line-height: 1;
     text-transform: uppercase;
+  }
+
+  /* Home: solo el logo, algo más contenido. */
+  .site-header--compact .bar {
+    padding-block: 0.35rem;
+  }
+
+  .site-header--compact .brand :global(img) {
+    width: 40px;
   }
 
   .nav-desktop {
@@ -179,27 +202,37 @@ const { strip = "checker" } = Astro.props;
     cursor: pointer;
   }
 
-  .burger__lines,
-  .burger__lines::before,
-  .burger__lines::after {
+  /* Tres líneas que se convierten en cruz: la del medio desaparece y las otras giran. */
+  .burger__lines {
+    position: relative;
     display: block;
     width: 20px;
+    height: 14px;
+  }
+
+  .burger__line {
+    position: absolute;
+    left: 0;
+    display: block;
+    width: 100%;
     height: 2px;
     background: var(--color-black);
+    transition:
+      translate 0.2s var(--ease-out),
+      rotate 0.2s var(--ease-out),
+      opacity 0.15s linear;
   }
 
-  .burger__lines::before,
-  .burger__lines::after {
-    content: "";
-    position: relative;
+  .burger__line:nth-child(1) {
+    top: 0;
   }
 
-  .burger__lines::before {
-    top: -6px;
+  .burger__line:nth-child(2) {
+    top: 6px;
   }
 
-  .burger__lines::after {
-    top: 4px;
+  .burger__line:nth-child(3) {
+    top: 12px;
   }
 
   .burger[aria-expanded="true"] {
@@ -207,10 +240,18 @@ const { strip = "checker" } = Astro.props;
     border-color: var(--color-brand);
   }
 
-  .burger[aria-expanded="true"] .burger__lines,
-  .burger[aria-expanded="true"] .burger__lines::before,
-  .burger[aria-expanded="true"] .burger__lines::after {
-    background: var(--color-black);
+  .burger[aria-expanded="true"] .burger__line:nth-child(1) {
+    translate: 0 6px;
+    rotate: 45deg;
+  }
+
+  .burger[aria-expanded="true"] .burger__line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .burger[aria-expanded="true"] .burger__line:nth-child(3) {
+    translate: 0 -6px;
+    rotate: -45deg;
   }
 
   .strip.checker {
@@ -224,13 +265,35 @@ const { strip = "checker" } = Astro.props;
     border-bottom: 1px solid var(--color-black);
   }
 
+  /* Oscurece la página (y el vídeo del hero) mientras el menú está abierto. */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: rgb(10 10 10 / 0.6);
+  }
+
+  /*
+   * El panel se superpone bajo la barra en vez de empujar la página. Su altura máxima
+   * se ajusta a la pantalla real del móvil y, si no cabe, hace scroll interno.
+   */
   .panel {
-    border-bottom: var(--frame-width) solid var(--color-black);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    max-height: calc(100vh - var(--header-height));
+    max-height: calc(100svh - var(--header-height));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-bottom: var(--frame-width) solid var(--color-brand);
     background: var(--color-black);
     color: var(--color-paper);
     padding: var(--space-m) var(--gutter) var(--space-l);
   }
 
+  .scrim[hidden],
   .panel[hidden] {
     display: none;
   }
@@ -247,6 +310,7 @@ const { strip = "checker" } = Astro.props;
     display: block;
     padding: 0.85rem 0;
     border-bottom: 1px solid #2a2a2a;
+    color: var(--color-paper);
     font-family: var(--font-display);
     font-size: var(--title-s);
     font-weight: 700;
@@ -255,7 +319,8 @@ const { strip = "checker" } = Astro.props;
     text-transform: uppercase;
   }
 
-  .panel a[data-menu-link]:hover {
+  .panel a[data-menu-link]:hover,
+  .panel a[data-menu-link]:focus-visible {
     color: var(--color-brand);
   }
 
@@ -269,47 +334,70 @@ const { strip = "checker" } = Astro.props;
       display: block;
     }
 
-    .burger {
-      display: none;
-    }
-
+    .burger,
+    .scrim,
     .panel {
       display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .burger__line {
+      transition: none;
     }
   }
 </style>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
-  const panel = document.querySelector<HTMLElement>("[data-menu-panel]");
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
 
-  if (toggle && panel) {
-    const setOpen = (open: boolean) => {
-      toggle.setAttribute("aria-expanded", String(open));
-      panel.hidden = !open;
-      const label = toggle.querySelector(".visually-hidden");
-      if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
-    };
+  // Si el script volviera a ejecutarse, el header ya inicializado no repite listeners.
+  if (header && header.dataset.menuReady !== "true") {
+    header.dataset.menuReady = "true";
 
-    toggle.addEventListener("click", () => {
-      setOpen(toggle.getAttribute("aria-expanded") !== "true");
-    });
+    const toggle = header.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const panel = header.querySelector<HTMLElement>("[data-menu-panel]");
+    const scrim = header.querySelector<HTMLElement>("[data-menu-scrim]");
+    const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
 
-    panel.querySelectorAll("[data-menu-link]").forEach((link) => {
-      link.addEventListener("click", () => setOpen(false));
-    });
+    if (toggle && panel) {
+      const isOpen = () => toggle.getAttribute("aria-expanded") === "true";
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      const setOpen = (open: boolean) => {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+        if (scrim) scrim.hidden = !open;
+        if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
+      };
+
+      // Hamburguesa / cruz.
+      toggle.addEventListener("click", () => setOpen(!isOpen()));
+
+      // Dentro del panel solo cierra un enlace (navegación o teléfono), no el resto del área.
+      panel.addEventListener("click", (event) => {
+        if ((event.target as Element).closest("a")) setOpen(false);
+      });
+
+      // Clic o toque fuera del panel y del botón (incluido el velo).
+      document.addEventListener("pointerdown", (event) => {
+        if (!isOpen()) return;
+        const target = event.target as Node;
+        if (panel.contains(target) || toggle.contains(target)) return;
+        setOpen(false);
+      });
+
+      // Escape cierra y devuelve el foco al botón.
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || !isOpen()) return;
         setOpen(false);
         toggle.focus();
-      }
-    });
+      });
 
-    // El panel es exclusivo de móvil: al pasar a escritorio se cierra.
-    const desktop = window.matchMedia("(min-width: 62rem)");
-    desktop.addEventListener("change", (event) => {
-      if (event.matches) setOpen(false);
-    });
+      // El panel es exclusivo de móvil: al pasar a escritorio se cierra.
+      const desktop = window.matchMedia("(min-width: 62rem)");
+      desktop.addEventListener("change", (event) => {
+        if (event.matches && isOpen()) setOpen(false);
+      });
+    }
   }
 </script>

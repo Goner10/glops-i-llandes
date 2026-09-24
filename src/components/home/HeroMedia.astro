@@ -14,6 +14,11 @@ interface Props {
   ratio?: string;
   /** Relación de aspecto a partir del breakpoint de escritorio (62rem). Por defecto, la misma. */
   ratioDesktop?: string;
+  /**
+   * Rellena el contenedor posicionado del padre en lugar de reservar un marco por
+   * relación de aspecto. Lo usa el hero a todo el ancho; el padre fija la altura.
+   */
+  fill?: boolean;
   widths?: number[];
   sizes?: string;
   loading?: "eager" | "lazy";
@@ -26,6 +31,7 @@ const {
   videoDesktop = null,
   ratio = "4 / 5",
   ratioDesktop = ratio,
+  fill = false,
   widths = [poster.width],
   sizes = "100vw",
   loading = "eager",
@@ -39,7 +45,10 @@ const posterUrl = hasVideo
   : undefined;
 ---
 
-<div class="hero-media" style={`--ratio: ${ratio}; --ratio-desktop: ${ratioDesktop}`}>
+<div
+  class:list={["hero-media", { "hero-media--fill": fill }]}
+  style={`--ratio: ${ratio}; --ratio-desktop: ${ratioDesktop}`}
+>
   <Image
     class="hero-media__image"
     src={poster}
@@ -78,12 +87,25 @@ const posterUrl = hasVideo
     background: var(--color-black);
   }
 
+  /* A todo el ancho: ocupa el padre posicionado y la altura la marca él. */
+  .hero-media--fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    aspect-ratio: auto;
+    /* Contiene la capa GPU del <video> para que no se pinte encima de hermanos. */
+    isolation: isolate;
+    pointer-events: none;
+  }
+
   .hero-media__image,
   .hero-media__video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    /* Anula el `max-width: 100%` global: en un abspos con height: 100% recortaría el encuadre. */
+    max-width: none;
     object-fit: cover;
     /* Encuadre del recorte; ajustar por breakpoint si el motivo no está centrado. */
     object-position: 50% 50%;
@@ -101,7 +123,7 @@ const posterUrl = hasVideo
 
   /* Mismo breakpoint que el cambio de fuente en el script y que Hero.astro. */
   @media (min-width: 62rem) {
-    .hero-media {
+    .hero-media:not(.hero-media--fill) {
       aspect-ratio: var(--ratio-desktop);
     }
   }

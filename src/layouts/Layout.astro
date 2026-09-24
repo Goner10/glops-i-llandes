@@ -12,9 +12,16 @@ interface Props {
   description?: string;
   /** Remate del header y del footer. La carta prescinde del damero. */
   strip?: "checker" | "rule";
+  /** Header solo con el logo gráfico (home, donde el nombre ya va en el H1 del hero). */
+  compactHeader?: boolean;
 }
 
-const { title, description = site.description, strip = "checker" } = Astro.props;
+const {
+  title,
+  description = site.description,
+  strip = "checker",
+  compactHeader = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -39,7 +46,7 @@ const { title, description = site.description, strip = "checker" } = Astro.props
 
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <Header strip={strip} />
+    <Header strip={strip} compact={compactHeader} />
     <slot />
     <Footer strip={strip} />
 

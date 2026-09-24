@@ -12,6 +12,20 @@ const claimParts = site.claim.split(" · ");
 ---
 
 <section class="hero" aria-labelledby="hero-titulo">
+  <!-- Fondo: vídeo (o imagen de respaldo) a todo el ancho, con la altura que fija `.hero`. -->
+  <HeroMedia
+    poster={heroImage}
+    alt="Barra de Glops i Llandes con taburetes verdes y las botellas de la estantería al fondo"
+    videoMobile={heroVideoMobile}
+    videoDesktop={heroVideoDesktop}
+    fill
+    widths={[612]}
+    sizes="100vw"
+  />
+
+  <!-- Degradado que garantiza el contraste del texto tanto sobre el vídeo como sobre la imagen. -->
+  <div class="hero__shade" aria-hidden="true"></div>
+
   <div class="container hero__inner">
     <div class="hero__text">
       <p class="eyebrow hero__where">
@@ -34,44 +48,64 @@ const claimParts = site.claim.split(" · ");
         }
       </p>
 
-      
-
       <div class="hero__actions">
         <a class="btn btn--brand" href={withBase("/carta")}>Ver la carta</a>
         <a class="btn hero__btn-reserva" href={site.reservations.url}>Reservar</a>
       </div>
     </div>
-
-    <div class="hero__media">
-      <div class="frame hero__frame">
-        <HeroMedia
-          poster={heroImage}
-          alt="Barra de Glops i Llandes con taburetes verdes y las botellas de la estantería al fondo"
-          videoMobile={heroVideoMobile}
-          videoDesktop={heroVideoDesktop}
-          ratio="4 / 5"
-          ratioDesktop="4 / 3"
-          widths={[400, 612]}
-          sizes="(min-width: 62rem) 520px, (min-width: 40rem) 60vw, 90vw"
-        />
-      </div>
-    </div>
   </div>
-
-  <div class="checker hero__strip" aria-hidden="true"></div>
 </section>
 
 <style>
+  /*
+   * Capas locales (todas dentro de este stacking context):
+   * 0 = vídeo / póster, 1 = degradado, 2 = texto y CTA.
+   * Flex, no grid: `min-height` no estira las filas de un grid, y `align-self: end`
+   * alineaba el texto al final de una fila corta en la parte alta, detrás del vídeo.
+   */
   .hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: calc(100vh - var(--header-height));
+    min-height: calc(100svh - var(--header-height));
     background: var(--color-black);
     color: var(--color-paper);
   }
 
+  .hero :global(.hero-media) {
+    z-index: 0;
+  }
+
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    /* Banda inferior: el vídeo móvil cambia y aclara justo detrás del texto. */
+    background: linear-gradient(
+      to top,
+      rgb(10 10 10 / 0.88) 0%,
+      rgb(10 10 10 / 0.7) 28%,
+      rgb(10 10 10 / 0.22) 48%,
+      rgb(10 10 10 / 0) 68%
+    );
+    pointer-events: none;
+  }
+
   .hero__inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-block: var(--space-m) var(--space-l);
+  }
+
+  .hero__text {
     display: grid;
-    gap: var(--space-l);
-    align-items: center;
-    padding-block: var(--space-xl) var(--space-2xl);
+    justify-items: start;
+    max-width: 36rem;
+    color: var(--color-paper);
   }
 
   .hero__where {
@@ -80,6 +114,7 @@ const claimParts = site.claim.split(" · ");
 
   .hero__title {
     margin-block: var(--space-s) var(--space-m);
+    color: var(--color-paper);
     font-size: var(--title-l);
     line-height: 0.86;
   }
@@ -99,8 +134,10 @@ const claimParts = site.claim.split(" · ");
     display: flex;
     flex-wrap: wrap;
     gap: 0.4em;
+    margin: 0;
     padding-block: var(--space-xs);
     border-block: 2px solid var(--color-paper);
+    color: var(--color-paper);
     font-family: var(--font-mono);
     font-size: var(--text-s);
     font-weight: 600;
@@ -112,65 +149,51 @@ const claimParts = site.claim.split(" · ");
     color: var(--color-brand);
   }
 
-  .hero__lede {
-    max-width: 34ch;
-    margin-top: var(--space-m);
-    color: #d8d5cd;
-  }
-
   .hero__actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-s);
-    margin-top: var(--space-l);
+    margin-top: var(--space-m);
   }
 
   .hero__btn-reserva {
-    background: transparent;
+    background: rgb(10 10 10 / 0.55);
     border-color: var(--color-paper);
     color: var(--color-paper);
   }
 
-  .hero__media {
-    position: relative;
-    /* El ancho explícito evita que el marco colapse: el medio se posiciona en absoluto. */
-    width: 100%;
-    max-width: 32rem;
-  }
-
-  .hero__frame {
-    border-color: var(--color-paper);
-  }
-
-  .hero__stamp {
-    position: absolute;
-    right: -0.5rem;
-    bottom: -1.75rem;
-    width: 6.5rem;
-    rotate: -9deg;
-  }
-
-  .hero__strip {
-    --checker-color: var(--color-paper);
-    --checker-size: 14px;
-    height: 14px;
+  .hero__btn-reserva:hover {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-black);
   }
 
   @media (min-width: 62rem) {
+    .hero__shade {
+      background:
+        linear-gradient(
+          to right,
+          rgb(10 10 10 / 0.78) 0%,
+          rgb(10 10 10 / 0.4) 38%,
+          rgb(10 10 10 / 0) 64%
+        ),
+        linear-gradient(to top, rgb(10 10 10 / 0.7) 0%, rgb(10 10 10 / 0) 42%);
+    }
+
     .hero__inner {
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: var(--space-xl);
+      padding-block: var(--space-xl);
     }
 
-    .hero__media {
-      justify-self: end;
-      max-width: 33rem;
+    .hero__text {
+      max-width: 40rem;
     }
 
-    .hero__stamp {
-      right: -2rem;
-      bottom: -2.5rem;
-      width: 8rem;
+    .hero__title {
+      font-size: clamp(3.4rem, 1.8rem + 4.2vw, 5.6rem);
+    }
+
+    .hero__actions {
+      margin-top: var(--space-l);
     }
   }
 </style>
