@@ -1,7 +1,10 @@
 ---
 import { Image } from "astro:assets";
 
-import logoBlack from "../../assets/images/brand/GLOPS2.png";
+import logoIconBlack from "../../assets/images/brand/logo-negro-solo.png";
+import logoIconWhite from "../../assets/images/brand/logo-blanco-solo.png";
+import logoTextBlack from "../../assets/images/brand/texto-negro.png";
+import logoTextWhite from "../../assets/images/brand/texto-blanco.png";
 import { site } from "../../config/site";
 import { withBase } from "../../lib/paths";
 
@@ -9,26 +12,58 @@ interface Props {
   /** Remate bajo la barra: damero en la portada, doble filete en la carta. */
   strip?: "checker" | "rule";
   /**
-   * Presentación compacta para la home: solo el logo gráfico, sin repetir el nombre,
-   * que ya lleva el H1 del hero. En páginas interiores el nombre acompaña al logo.
+   * Home: el header móvil se superpone al hero y cambia de aspecto al salir de él.
+   * En páginas interiores el estado sólido (papel + wordmark negro) es el de partida.
    */
   compact?: boolean;
 }
 
 const { strip = "checker", compact = false } = Astro.props;
+const overlaid = compact;
 ---
 
-<header class:list={["site-header", { "site-header--compact": compact }]} data-site-header>
+<header
+  class:list={["site-header", { "site-header--compact": compact, "site-header--overlaid": overlaid }]}
+  data-site-header
+  data-header-overlaid={overlaid ? "" : undefined}
+>
   <div class="bar">
     <a class="brand" href={withBase("/")}>
-      <Image
-        src={logoBlack}
-        alt={`${site.name}, inicio`}
-        widths={[150]}
-        sizes="44px"
-        loading="eager"
-      />
-      {!compact && <span class="brand__name">Glops<span aria-hidden="true"> i </span>Llandes</span>}
+      <span class="visually-hidden">{site.name}, inicio</span>
+      <span class="brand__slot" aria-hidden="true">
+        <Image
+          class="brand__full brand__full--white"
+          src={logoTextWhite}
+          alt=""
+          widths={[280, 440]}
+          sizes="(min-width: 62rem) 212px, 58vw"
+          loading="eager"
+        />
+        <Image
+          class="brand__full brand__full--black"
+          src={logoTextBlack}
+          alt=""
+          widths={[280, 440]}
+          sizes="(min-width: 62rem) 212px, 58vw"
+          loading="eager"
+        />
+        <Image
+          class="brand__icon brand__icon--white"
+          src={logoIconWhite}
+          alt=""
+          widths={[80, 120]}
+          sizes="40px"
+          loading="eager"
+        />
+        <Image
+          class="brand__icon brand__icon--black"
+          src={logoIconBlack}
+          alt=""
+          widths={[80, 120]}
+          sizes="40px"
+          loading="eager"
+        />
+      </span>
     </a>
 
     <nav class="nav-desktop" aria-label="Navegación principal">
@@ -116,27 +151,98 @@ const { strip = "checker", compact = false } = Astro.props;
     text-decoration: none;
   }
 
-  .brand :global(img) {
-    width: 44px;
+  /*
+   * Hueco estable: en la home conserva el ancho del wordmark aunque se muestre
+   * solo el dibujo, para que no salten la nav ni el botón del menú.
+   */
+  .brand__slot {
+    position: relative;
+    display: block;
+    width: 3.5rem;
+    height: 2.4rem;
+  }
+
+  .site-header--overlaid .brand__slot {
+    width: min(13.25rem, 58vw);
     height: auto;
+    aspect-ratio: 4419 / 844;
   }
 
-  .brand__name {
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1;
-    text-transform: uppercase;
+  .brand :global(.brand__full),
+  .brand :global(.brand__icon) {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s var(--ease-out),
+      translate 0.22s var(--ease-out),
+      scale 0.22s var(--ease-out),
+      visibility 0.22s;
   }
 
-  /* Home: solo el logo, algo más contenido. */
+  .brand :global(.brand__full) {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left center;
+    scale: 0.96;
+    translate: 0 0.15rem;
+  }
+
+  .brand :global(.brand__icon) {
+    top: 50%;
+    left: 0;
+    width: auto;
+    height: 2.4rem;
+    scale: 0.92;
+    translate: 0 -40%;
+  }
+
+  /* Visible: carta/reservas y home compactada + papel. */
+  .site-header:not(.site-header--overlaid) .brand :global(.brand__icon--black),
+  .site-header--overlaid.is-compacted.is-solid .brand :global(.brand__icon--black),
+  .site-header--overlaid.is-compacted.is-menu-open .brand :global(.brand__icon--black) {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    translate: 0 -50%;
+  }
+
+  /* Home arriba del todo, sobre el vídeo. */
+  .site-header--overlaid:not(.is-compacted) .brand :global(.brand__full--white) {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    translate: 0;
+  }
+
+  /* Home arriba del todo con barra de papel (menú abierto). */
+  .site-header--overlaid:not(.is-compacted).is-solid .brand :global(.brand__full--white),
+  .site-header--overlaid:not(.is-compacted).is-menu-open .brand :global(.brand__full--white) {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .site-header--overlaid:not(.is-compacted).is-solid .brand :global(.brand__full--black),
+  .site-header--overlaid:not(.is-compacted).is-menu-open .brand :global(.brand__full--black) {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    translate: 0;
+  }
+
+  /* Home scrolleada, todavía sobre el vídeo. */
+  .site-header--overlaid.is-compacted:not(.is-solid):not(.is-menu-open) .brand :global(.brand__icon--white) {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    translate: 0 -50%;
+  }
+
   .site-header--compact .bar {
     padding-block: 0.35rem;
-  }
-
-  .site-header--compact .brand :global(img) {
-    width: 40px;
   }
 
   .nav-desktop {
@@ -328,6 +434,69 @@ const { strip = "checker", compact = false } = Astro.props;
     width: 100%;
   }
 
+  /*
+   * Home (overlaid), todos los anchos: header fijo sobre el vídeo. El observer
+   * añade `is-solid` cuando el hero deja de cortar la franja de la barra.
+   */
+  .site-header--overlaid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+  }
+
+  .site-header--overlaid .bar {
+    background: rgb(0 0 0 / 0.2);
+    transition: background-color 0.25s var(--ease-out);
+  }
+
+  .site-header--overlaid.is-solid,
+  .site-header--overlaid.is-menu-open {
+    background: var(--color-paper);
+  }
+
+  .site-header--overlaid.is-solid .bar,
+  .site-header--overlaid.is-menu-open .bar {
+    background: var(--color-paper);
+  }
+
+  /* Móvil: hamburguesa clara sobre el vídeo. */
+  @media (max-width: 61.99rem) {
+    .site-header--overlaid .burger {
+      background: transparent;
+      border-color: var(--color-paper);
+    }
+
+    .site-header--overlaid .burger__line {
+      background: var(--color-paper);
+    }
+
+    .site-header--overlaid.is-solid .burger,
+    .site-header--overlaid.is-menu-open .burger {
+      background: var(--color-paper);
+      border-color: var(--color-black);
+    }
+
+    .site-header--overlaid.is-solid .burger__line,
+    .site-header--overlaid.is-menu-open .burger__line {
+      background: var(--color-black);
+    }
+
+    .site-header--overlaid .burger[aria-expanded="true"],
+    .site-header--overlaid.is-solid .burger[aria-expanded="true"],
+    .site-header--overlaid.is-menu-open .burger[aria-expanded="true"] {
+      background: var(--color-brand);
+      border-color: var(--color-brand);
+    }
+
+    .site-header--overlaid .burger[aria-expanded="true"] .burger__line,
+    .site-header--overlaid.is-solid .burger[aria-expanded="true"] .burger__line,
+    .site-header--overlaid.is-menu-open .burger[aria-expanded="true"] .burger__line {
+      background: var(--color-black);
+    }
+  }
+
   @media (min-width: 62rem) {
     .nav-desktop,
     .phone {
@@ -339,10 +508,33 @@ const { strip = "checker", compact = false } = Astro.props;
     .panel {
       display: none;
     }
+
+    .site-header--overlaid .nav-desktop a,
+    .site-header--overlaid .phone {
+      color: var(--color-paper);
+    }
+
+    .site-header--overlaid .nav-desktop a:hover,
+    .site-header--overlaid .phone:hover {
+      border-bottom-color: var(--color-black);
+      background: var(--color-brand);
+      color: var(--color-black);
+    }
+
+    .site-header--overlaid.is-solid .nav-desktop a,
+    .site-header--overlaid.is-solid .phone {
+      color: inherit;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .burger__line {
+      transition: none;
+    }
+
+    .site-header--overlaid .bar,
+    .brand :global(.brand__full),
+    .brand :global(.brand__icon) {
       transition: none;
     }
   }
@@ -359,26 +551,67 @@ const { strip = "checker", compact = false } = Astro.props;
     const panel = header.querySelector<HTMLElement>("[data-menu-panel]");
     const scrim = header.querySelector<HTMLElement>("[data-menu-scrim]");
     const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
+    const overlaid = header.hasAttribute("data-header-overlaid");
+    const desktop = window.matchMedia("(min-width: 62rem)");
+    const hero = document.querySelector<HTMLElement>("[data-hero]");
+
+    let heroInTopBand = true;
+    let compacted = false;
+
+    const COMPACT_ON = 16;
+    const COMPACT_OFF = 4;
+
+    const isOpen = () => toggle?.getAttribute("aria-expanded") === "true";
+
+    /**
+     * El hero «está en la zona superior» mientras su caja corta la franja que ocupa
+     * el header. `rootMargin` superior negativo recorta el viewport a partir del
+     * borde inferior de la barra: no es un umbral de `scrollY`.
+     */
+    const measureHeroInTopBand = () => {
+      if (!hero) return false;
+      return hero.getBoundingClientRect().bottom > header.offsetHeight;
+    };
+
+    const applyAppearance = () => {
+      if (!overlaid) {
+        header.classList.remove("is-solid");
+        header.classList.remove("is-compacted");
+        return;
+      }
+      header.classList.toggle("is-solid", !heroInTopBand || isOpen());
+      header.classList.toggle("is-compacted", compacted);
+    };
+
+    /**
+     * Compacta al primer scroll y solo recupera el wordmark cerca de 0, con
+     * holgura para que 1–2 px no hagan oscilar el estado.
+     */
+    const applyCompact = () => {
+      if (!overlaid) return;
+      const y = window.scrollY;
+      if (!compacted && y > COMPACT_ON) compacted = true;
+      else if (compacted && y < COMPACT_OFF) compacted = false;
+      header.classList.toggle("is-compacted", compacted);
+    };
+
+    const setOpen = (open: boolean) => {
+      if (!toggle || !panel) return;
+      toggle.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      if (scrim) scrim.hidden = !open;
+      if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
+      header.classList.toggle("is-menu-open", open);
+      applyAppearance();
+    };
 
     if (toggle && panel) {
-      const isOpen = () => toggle.getAttribute("aria-expanded") === "true";
-
-      const setOpen = (open: boolean) => {
-        toggle.setAttribute("aria-expanded", String(open));
-        panel.hidden = !open;
-        if (scrim) scrim.hidden = !open;
-        if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
-      };
-
-      // Hamburguesa / cruz.
       toggle.addEventListener("click", () => setOpen(!isOpen()));
 
-      // Dentro del panel solo cierra un enlace (navegación o teléfono), no el resto del área.
       panel.addEventListener("click", (event) => {
         if ((event.target as Element).closest("a")) setOpen(false);
       });
 
-      // Clic o toque fuera del panel y del botón (incluido el velo).
       document.addEventListener("pointerdown", (event) => {
         if (!isOpen()) return;
         const target = event.target as Node;
@@ -386,17 +619,52 @@ const { strip = "checker", compact = false } = Astro.props;
         setOpen(false);
       });
 
-      // Escape cierra y devuelve el foco al botón.
       document.addEventListener("keydown", (event) => {
         if (event.key !== "Escape" || !isOpen()) return;
         setOpen(false);
         toggle.focus();
       });
 
-      // El panel es exclusivo de móvil: al pasar a escritorio se cierra.
-      const desktop = window.matchMedia("(min-width: 62rem)");
       desktop.addEventListener("change", (event) => {
         if (event.matches && isOpen()) setOpen(false);
+        applyAppearance();
+      });
+    }
+
+    if (overlaid && hero && "IntersectionObserver" in window) {
+      const connect = () => {
+        const top = header.offsetHeight;
+        return new IntersectionObserver(
+          ([entry]) => {
+            if (!entry) return;
+            heroInTopBand = entry.isIntersecting;
+            applyAppearance();
+          },
+          { root: null, threshold: 0, rootMargin: `-${top}px 0px 0px 0px` },
+        );
+      };
+
+      let observer = connect();
+      observer.observe(hero);
+
+      heroInTopBand = measureHeroInTopBand();
+      applyAppearance();
+
+      window.addEventListener("pageshow", () => {
+        heroInTopBand = measureHeroInTopBand();
+        applyCompact();
+        applyAppearance();
+      });
+
+      window.addEventListener("scroll", applyCompact, { passive: true });
+      applyCompact();
+
+      desktop.addEventListener("change", () => {
+        observer.disconnect();
+        observer = connect();
+        observer.observe(hero);
+        heroInTopBand = measureHeroInTopBand();
+        applyAppearance();
       });
     }
   }

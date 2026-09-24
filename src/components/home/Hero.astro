@@ -11,7 +11,7 @@ const heroVideoDesktop = withBase("/videos/hero-desktop.mp4");
 const claimParts = site.claim.split(" · ");
 ---
 
-<section class="hero" aria-labelledby="hero-titulo">
+<section class="hero" aria-labelledby="hero-titulo" data-hero>
   <!-- Fondo: vídeo (o imagen de respaldo) a todo el ancho, con la altura que fija `.hero`. -->
   <HeroMedia
     poster={heroImage}
@@ -69,8 +69,9 @@ const claimParts = site.claim.split(" · ");
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    min-height: calc(100vh - var(--header-height));
-    min-height: calc(100svh - var(--header-height));
+    /* El header va superpuesto: el vídeo ocupa también la franja superior. */
+    min-height: 100vh;
+    min-height: 100svh;
     background: var(--color-black);
     color: var(--color-paper);
   }
