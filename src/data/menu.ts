@@ -1,6 +1,6 @@
 import type { AllergenId } from './allergens';
 
-export type MenuCategoryId =  'aperitivos' | 'tablas' | 'compartir' | 'postres' | 'cocteles';
+export type MenuCategoryId =  'aperitivos' | 'tablas' | 'compartir' | 'pates' | 'conservas' | 'extras' | 'postres' | 'cocteles';
 
 export interface MenuCategory {
   readonly id: MenuCategoryId;
@@ -38,8 +38,11 @@ export const menuCategories: readonly MenuCategory[] = [
   { id: 'aperitivos', label: 'Aperitivos' },
   { id: 'tablas', label: 'Tablas' },
   { id: 'compartir', label: 'Para compartir' },
-  { id: 'cocteles', label: 'Cócteles' },
+  { id: 'pates', label: 'Patés' },
+  { id: 'conservas', label: 'Conservas' },
+  { id: 'extras', label: 'Extras' },
   { id: 'postres', label: 'Postres' },
+  { id: 'cocteles', label: 'Cócteles' },
 ];
 
 
@@ -144,6 +147,39 @@ export const menuProducts: readonly MenuProduct[] = [
     image: null,
     imageAlt: null,
     allergens: ['gluten', 'pescado', 'huevos', 'crustaceos'],
+    description: null,
+  },
+  {
+    id: 'pate-de-atun-a-la-mostaza-y-miel',
+    name: 'Paté de Atún a la Mostaza y Miel',
+    category: 'pates',
+    price: 8.5,
+    priceLabel: '8,50 €',
+    image: null,
+    imageAlt: null,
+    allergens: ['gluten', 'pescado', 'sulfitos'],
+    description: null,
+  },
+  {
+    id: 'chipirones-en-su-tinta',
+    name: 'Chipirones en su Tinta',
+    category: 'conservas',
+    price: 11.20,
+    priceLabel: '11,20 €',
+    image: null,
+    imageAlt: null,
+    allergens: ['gluten', 'pescado', 'moluscos', 'crustaceos'],
+    description: null,
+  },
+  {
+    id: 'pan-de-masa-madre',
+    name: 'Pan de Masa Madre',
+    category: 'extras',
+    price: 2.5,
+    priceLabel: '2,50 €',
+    image: null,
+    imageAlt: null,
+    allergens: ['gluten'],
     description: null,
   },
   {
