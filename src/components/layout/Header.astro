@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 
 import logoBlack from "../../assets/images/brand/GLOPS2.png";
 import { site } from "../../config/site";
+import { withBase } from "../../lib/paths";
 
 interface Props {
   /** Remate bajo la barra: damero en la portada, doble filete en la carta. */
@@ -14,7 +15,7 @@ const { strip = "checker" } = Astro.props;
 
 <header class="site-header">
   <div class="bar">
-    <a class="brand" href="/">
+    <a class="brand" href={withBase("/")}>
       <Image
         src={logoBlack}
         alt={`${site.name}, inicio`}

@@ -1,5 +1,6 @@
 ---
 import { featuredProducts, getCategoryLabel } from "../../data/menu";
+import { withBase } from "../../lib/paths";
 ---
 
 <section class="featured" id="carta" aria-labelledby="carta-titulo">
@@ -10,7 +11,7 @@ import { featuredProducts, getCategoryLabel } from "../../data/menu";
       <p class="featured__note">
         Una muestra corta. La carta completa vive en su propia página, con buscador y filtros.
       </p>
-      <a class="btn btn--brand featured__cta" href="/carta">Ver la carta completa</a>
+      <a class="btn btn--brand featured__cta" href={withBase("/carta")}>Ver la carta completa</a>
       <p class="stamp featured__stamp">Carta en revisión</p>
     </div>
 

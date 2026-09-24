@@ -1,4 +1,5 @@
 import type { MenuProduct } from "../../data/menu";
+import { withBase } from "../../lib/paths";
 import AllergenList from "./AllergenList";
 import ProductPlaceholder from "./ProductPlaceholder";
 
@@ -25,7 +26,7 @@ export default function ProductCard({ product, onOpen }: ProductCardProps) {
           ) : (
             <img
               className="product-card__image"
-              src={product.image}
+              src={withBase(product.image)}
               alt={product.imageAlt ?? product.name}
               width={500}
               height={667}

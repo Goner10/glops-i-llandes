@@ -2,6 +2,7 @@
 import MenuExplorer from "../components/menu/MenuExplorer";
 import { site } from "../config/site";
 import Layout from "../layouts/Layout.astro";
+import { withBase } from "../lib/paths";
 
 // La franja se repite lo justo para cruzar la pantalla más ancha sin animarse.
 const tickerRepeats = 8;
@@ -46,7 +47,7 @@ const tickerRepeats = 8;
         <h2 id="carta-cta-titulo">¿Nos vemos<br />en la barra?</h2>
         <div class="carta-cta__actions">
           <a class="btn btn--brand" href={site.phone.href}>Llamar {site.phone.display}</a>
-          <a class="btn carta-cta__ghost" href="/#ubicacion">Cómo llegar</a>
+          <a class="btn carta-cta__ghost" href={withBase("/#ubicacion")}>Cómo llegar</a>
         </div>
       </div>
     </section>

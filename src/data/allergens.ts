@@ -6,6 +6,8 @@
  * archivo, así que se usan tal cual hasta que haya una versión solo de icono.
  */
 
+import { withBase } from '../lib/paths';
+
 export type AllergenId =
   | 'apio'
   | 'crustaceos'
@@ -23,12 +25,12 @@ export type AllergenId =
 export interface Allergen {
   readonly id: AllergenId;
   readonly label: string;
-  /** Ruta pública del SVG, servido desde `public/`. */
+  /** Ruta pública del SVG, servido desde `public/`, ya con el base del despliegue. */
   readonly icon: string;
 }
 
 function entry(id: AllergenId, label: string): Allergen {
-  return { id, label, icon: `/images/allergens/${id}.svg` };
+  return { id, label, icon: withBase(`/images/allergens/${id}.svg`) };
 }
 
 export const allergens: Readonly<Record<AllergenId, Allergen>> = {

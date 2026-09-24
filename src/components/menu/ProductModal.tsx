@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { getCategoryLabel, type MenuProduct } from "../../data/menu";
+import { withBase } from "../../lib/paths";
 import AllergenList from "./AllergenList";
 import ProductPlaceholder from "./ProductPlaceholder";
 
@@ -75,7 +76,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           ) : (
             <img
               className="product-modal__image"
-              src={product.image}
+              src={withBase(product.image)}
               alt={product.imageAlt ?? product.name}
               width={500}
               height={667}

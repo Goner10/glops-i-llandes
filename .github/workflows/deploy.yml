@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Publica en cada push a `main`, la rama por defecto del repositorio.
+  push:
+    branches: [main]
+  # Permite lanzar el despliegue a mano desde la pestaña Actions.
+  workflow_dispatch:
+
+# Permisos mínimos para clonar el repo y crear un despliegue de Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si llegan varios pushes seguidos, solo se despliega el último; no se cancela
+# un despliegue ya en curso para no dejar Pages a medias.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v7
+
+      - name: Install, build, and upload your site
+        uses: withastro/action@v6
+        # npm se detecta por el package-lock.json del repo; el build es `npm run build`.
+        with:
+          node-version: 24
+        env:
+          # Activa `base: /glops-i-llandes` y `site` en astro.config.mjs.
+          # Al ir en el paso, llega a `npm install` y a `npm run build` de la acción.
+          DEPLOY_TARGET: github-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

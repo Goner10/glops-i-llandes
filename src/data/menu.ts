@@ -16,7 +16,8 @@ export interface MenuProduct {
   /** Precio ya formateado tal y como debe leerse en la web. */
   readonly priceLabel: string;
   /**
-   * Ruta pública de la fotografía del producto.
+   * Ruta pública de la fotografía del producto, desde la raíz de `public/`
+   * (p. ej. `/images/products/gilda.jpg`); las fichas le añaden el base con `withBase`.
    * `null` mientras no haya fotografía definitiva: la ficha usa el hueco gráfico.
    */
   readonly image: string | null;

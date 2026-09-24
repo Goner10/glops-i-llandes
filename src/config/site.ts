@@ -1,3 +1,5 @@
+import { withBase } from '../lib/paths';
+
 export interface SiteAddress {
   readonly street: string;
   readonly postalCode: string;
@@ -58,7 +60,7 @@ const phone: SitePhone = {
 };
 
 const reservations: SiteReservations = {
-  url: '/reservas',
+  url: withBase('/reservas'),
   note: 'Reserva online o por teléfono. Para grupos grandes, mejor llámanos.',
   widget: {
     eid: 'hydra-882011d3-6ed0-4816-b696-e98e1b6cf02d',
@@ -67,11 +69,12 @@ const reservations: SiteReservations = {
   },
 };
 
+// Rutas internas ya resueltas con el base del despliegue.
 const nav: readonly SiteNavItem[] = [
-  { label: 'Carta', href: '/carta' },
-  { label: 'La casa', href: '/#manifesto' },
-  { label: 'Galería', href: '/#galeria' },
-  { label: 'Dónde estamos', href: '/#ubicacion' },
+  { label: 'Carta', href: withBase('/carta') },
+  { label: 'La casa', href: withBase('/#manifesto') },
+  { label: 'Galería', href: withBase('/#galeria') },
+  { label: 'Dónde estamos', href: withBase('/#ubicacion') },
 ];
 
 export const site = {

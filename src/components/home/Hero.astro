@@ -1,11 +1,12 @@
 ---
 import heroImage from "../../assets/images/home/barraGlops.jpeg";
 import { site } from "../../config/site";
+import { withBase } from "../../lib/paths";
 import HeroMedia from "./HeroMedia.astro";
 
 // Vídeos decorativos de `public/videos`: vertical por debajo de 62rem, horizontal a partir de ahí.
-const heroVideoMobile = "/videos/hero-mobile.mp4";
-const heroVideoDesktop = "/videos/hero-desktop.mp4";
+const heroVideoMobile = withBase("/videos/hero-mobile.mp4");
+const heroVideoDesktop = withBase("/videos/hero-desktop.mp4");
 
 const claimParts = site.claim.split(" · ");
 ---
@@ -38,7 +39,7 @@ const claimParts = site.claim.split(" · ");
       </p>
 
       <div class="hero__actions">
-        <a class="btn btn--brand" href="/carta">Ver la carta</a>
+        <a class="btn btn--brand" href={withBase("/carta")}>Ver la carta</a>
         <a class="btn hero__btn-reserva" href={site.reservations.url}>Reservar</a>
       </div>
     </div>
