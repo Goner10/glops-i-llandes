@@ -1,0 +1,161 @@
+---
+import { site } from "../config/site";
+import Layout from "../layouts/Layout.astro";
+
+const { widget } = site.reservations;
+---
+
+<Layout
+  title={`Reserva tu mesa · ${site.name}`}
+  description={`Reserva online tu mesa en ${site.name}, bar de tapas y cócteles en el Cabanyal, o llámanos al ${site.phone.display}.`}
+  strip="rule"
+>
+  <main id="contenido">
+    <section class="reservas-head" aria-labelledby="reservas-titulo">
+      <div class="container reservas-head__inner">
+        <p class="eyebrow reservas-head__eyebrow">Reservas</p>
+        <h1 id="reservas-titulo">Reserva<br />tu mesa</h1>
+        <p class="reservas-head__text">
+        Para grupos y para las horas punta, mejor asegurar sitio.
+        </p>
+      </div>
+    </section>
+
+    <section class="reservas-widget" aria-label="Reserva online">
+      <div class="container">
+        <!-- El widget de Dish se monta en este contenedor; el `id` es el `tagid` de `_hors`. -->
+        <div class="reservas-widget__box" id={widget.containerId}></div>
+
+        <p class="reservas-widget__error" data-reservas-error hidden>
+          No se ha podido cargar el sistema de reservas. Llámanos y te guardamos la mesa.
+        </p>
+
+        <!--
+          Script inline a propósito (Astro no lo empaqueta ni lo mueve al head): va justo
+          después del contenedor, así `_hors` queda definido antes de pedir widget.js y el
+          contenedor ya existe cuando este se ejecuta. Solo en esta página y una única vez.
+        -->
+        <script
+          is:inline
+          define:vars={{ eid: widget.eid, tagid: widget.containerId, src: widget.scriptSrc }}
+        >
+          (function () {
+            if (document.querySelector('script[src="' + src + '"]')) return;
+
+            // widget.js recorre `_hors` como lista de pares [clave, valor], no como objeto.
+            window._hors = [
+              ["eid", eid],
+              ["tagid", tagid],
+              ["width", "100%"],
+              ["height", ""],
+            ];
+
+            var script = document.createElement("script");
+            script.src = src;
+            script.async = true;
+            script.onerror = function () {
+              var error = document.querySelector("[data-reservas-error]");
+              if (error) error.hidden = false;
+            };
+            document.body.appendChild(script);
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="reservas-phone" aria-labelledby="reservas-telefono-titulo">
+      <div class="container reservas-phone__inner">
+        <div>
+          <h2 id="reservas-telefono-titulo">¿Prefieres<br />llamar?</h2>
+          <p class="reservas-phone__note">{site.reservations.note}</p>
+        </div>
+        <a class="btn btn--brand reservas-phone__btn" href={site.phone.href}>
+          Llamar {site.phone.display}
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .reservas-head {
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .reservas-head__inner {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-m);
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  .reservas-head__eyebrow {
+    color: var(--color-brand);
+  }
+
+  .reservas-head__text {
+    max-width: 40ch;
+    color: #d8d5cd;
+  }
+
+  .reservas-widget {
+    padding-block: var(--space-xl);
+    background: var(--color-paper);
+    /* El widget inyecta su propio iframe: se recorta cualquier exceso sin crear scroll. */
+    overflow-x: clip;
+  }
+
+  .reservas-widget__box {
+    width: 100%;
+    max-width: 52rem;
+    /* Reserva altura mientras carga para que el teléfono no salte al montarse el widget. */
+    min-height: 28rem;
+    margin-inline: auto;
+  }
+
+  .reservas-widget__box :global(iframe) {
+    display: block;
+    max-width: 100%;
+  }
+
+  .reservas-widget__error {
+    max-width: 44ch;
+    margin: var(--space-m) auto 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  .reservas-phone {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+    border-top: var(--frame-width) solid var(--color-black);
+  }
+
+  .reservas-phone__inner {
+    display: grid;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .reservas-phone__note {
+    max-width: 40ch;
+    margin-top: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+  }
+
+  .reservas-phone__btn {
+    justify-self: start;
+    font-size: var(--text-l);
+  }
+
+  @media (min-width: 62rem) {
+    .reservas-phone__inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

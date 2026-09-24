@@ -1,0 +1,102 @@
+---
+import { site } from "../../config/site";
+---
+
+<section class="reservations" id="reservas" aria-labelledby="reservas-titulo">
+  <div class="container reservations__inner">
+    <div class="reservations__head">
+      <p class="eyebrow reservations__eyebrow">Reservas</p>
+      <h2 id="reservas-titulo">Guárdanos<br />la mesa</h2>
+      <p class="reservations__text">
+        Para grupos y para las horas punta, mejor avisar antes.
+      </p>
+    </div>
+
+    <div class="reservations__actions">
+      <a class="btn btn--brand reservations__phone" href={site.phone.href}>
+        Llamar {site.phone.display}
+      </a>
+
+      <a class="btn reservations__online" href={site.reservations.url}>Reservar online</a>
+
+      <p class="reservations__note">{site.reservations.note}</p>
+    </div>
+  </div>
+
+  <div class="checker reservations__strip" aria-hidden="true"></div>
+</section>
+
+<style>
+  .reservations {
+    padding-top: var(--space-2xl);
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .reservations__inner {
+    display: grid;
+    gap: var(--space-l);
+    padding-bottom: var(--space-2xl);
+    align-items: center;
+  }
+
+  .reservations__eyebrow {
+    margin-bottom: var(--space-xs);
+    color: var(--color-brand);
+  }
+
+  .reservations__text {
+    max-width: 36ch;
+    margin-top: var(--space-m);
+    color: #d8d5cd;
+  }
+
+  .reservations__actions {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-s);
+  }
+
+  .reservations__phone {
+    font-size: var(--text-l);
+  }
+
+  /* Sobre fondo negro el botón base se perfila en papel, como el «Reservar» del hero. */
+  .reservations__online {
+    background: transparent;
+    border-color: var(--color-paper);
+    color: var(--color-paper);
+  }
+
+  .reservations__note {
+    max-width: 40ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.8;
+    color: var(--color-gray);
+  }
+
+  .reservations__strip {
+    --checker-color: var(--color-brand);
+    --checker-size: 14px;
+    height: 14px;
+  }
+
+  @media (min-width: 62rem) {
+    .reservations__inner {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+
+    .reservations__actions {
+      justify-self: end;
+      width: 100%;
+      max-width: 24rem;
+    }
+
+    .reservations__phone,
+    .reservations__online {
+      width: 100%;
+    }
+  }
+</style>

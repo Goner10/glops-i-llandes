@@ -1,22 +1,30 @@
-## Development
+# Glops i Llandes
 
-When starting the dev server, use background mode:
+Web de un bar de tapas de El Cabanyal. Astro + TypeScript; React solo para la isla interactiva de la carta. Sin backend propio. Las reservas usan un servicio externo.
 
-```
-astro dev --background
-```
+## Antes de editar
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+- Lee los archivos directamente relacionados con la tarea y sus usos inmediatos. No recorras todo el proyecto salvo que sea necesario.
+- Respeta los componentes, estilos y convenciones existentes.
+- Consulta la documentación oficial de Astro cuando cambies configuración, rutas, hidratación o una API cuyo comportamiento no esté claro.
 
-## Documentation
+## Carta y contenido
 
-Full documentation: https://docs.astro.build
+- Los productos se definen en `src/data/menu.ts`.
+- No inventes descripciones, ingredientes, precios ni alérgenos. Los datos pendientes deben permanecer sin completar hasta confirmarlos con el local.
+- Las descripciones se muestran en el modal; las tarjetas muestran imagen, nombre, precio y alérgenos.
+- Mantén la accesibilidad del modal y de los iconos de alérgenos.
 
-Consult these guides before working on related tasks:
+## Diseño y assets
 
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+- Usa los tokens CSS existentes. El color de marca es `#E2A300`; evita reintroducir el naranja antiguo o el patrón de damero.
+- No renombres ni elimines assets sin comprobar antes dónde se usan.
+- Conserva los colores originales de los SVG de alérgenos.
+
+## Verificación
+
+- Haz solo las comprobaciones proporcionadas al alcance del cambio. Si el usuario indica que verificará el resultado, no ejecutes build ni pruebas adicionales.
+- No hagas commits salvo petición expresa.
+
+## Servidor de desarrollo
+

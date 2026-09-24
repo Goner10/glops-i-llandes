@@ -1,0 +1,320 @@
+---
+import { Image } from "astro:assets";
+
+import logoBlack from "../../assets/images/brand/GLOPS2.png";
+import { site } from "../../config/site";
+
+interface Props {
+  /** Remate bajo la barra: damero en la portada, doble filete en la carta. */
+  strip?: "checker" | "rule";
+}
+
+const { strip = "checker" } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="/">
+      <Image
+        src={logoBlack}
+        alt={`${site.name}, inicio`}
+        widths={[150]}
+        sizes="44px"
+        loading="eager"
+      />
+      <span class="brand__name">Glops<span aria-hidden="true"> i </span>Llandes</span>
+    </a>
+
+    <nav class="nav-desktop" aria-label="Navegación principal">
+      <ul>
+        {
+          site.nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a class="phone" href={site.phone.href}>{site.phone.display}</a>
+      <button
+        class="burger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        data-menu-toggle
+      >
+        <span class="burger__lines" aria-hidden="true"></span>
+        <span class="visually-hidden">Abrir menú</span>
+      </button>
+    </div>
+  </div>
+
+  {
+    strip === "checker" ? (
+      <div class="checker strip" aria-hidden="true" />
+    ) : (
+      <div class="strip strip--rule" aria-hidden="true" />
+    )
+  }
+
+  <div class="panel" id="menu-movil" hidden data-menu-panel>
+    <nav aria-label="Navegación móvil">
+      <ul>
+        {
+          site.nav.map((item) => (
+            <li>
+              <a href={item.href} data-menu-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <a class="btn btn--brand panel__cta" href={site.phone.href}>
+      Llamar {site.phone.display}
+    </a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--color-paper);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    width: 100%;
+    max-width: var(--container);
+    min-height: var(--header-height);
+    margin-inline: auto;
+    padding: 0.5rem var(--gutter);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-right: auto;
+    text-decoration: none;
+  }
+
+  .brand :global(img) {
+    width: 44px;
+    height: auto;
+  }
+
+  .brand__name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .nav-desktop {
+    display: none;
+  }
+
+  .nav-desktop ul {
+    display: flex;
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-desktop a {
+    display: inline-block;
+    padding: 0.35rem 0.5rem;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  /* Inversión: el mostaza como texto sobre papel no llega al contraste mínimo. */
+  .nav-desktop a:hover {
+    border-bottom-color: var(--color-black);
+    background: var(--color-brand);
+    color: var(--color-black);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+
+  .phone {
+    display: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--radius-s);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+  }
+
+  .phone:hover {
+    background: var(--color-brand);
+    color: var(--color-black);
+  }
+
+  .burger {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 2px solid var(--color-black);
+    border-radius: var(--radius-m);
+    background: var(--color-paper);
+    cursor: pointer;
+  }
+
+  .burger__lines,
+  .burger__lines::before,
+  .burger__lines::after {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--color-black);
+  }
+
+  .burger__lines::before,
+  .burger__lines::after {
+    content: "";
+    position: relative;
+  }
+
+  .burger__lines::before {
+    top: -6px;
+  }
+
+  .burger__lines::after {
+    top: 4px;
+  }
+
+  .burger[aria-expanded="true"] {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+
+  .burger[aria-expanded="true"] .burger__lines,
+  .burger[aria-expanded="true"] .burger__lines::before,
+  .burger[aria-expanded="true"] .burger__lines::after {
+    background: var(--color-black);
+  }
+
+  .strip.checker {
+    --checker-size: 10px;
+    height: 10px;
+  }
+
+  .strip--rule {
+    height: 5px;
+    border-top: 1px solid var(--color-black);
+    border-bottom: 1px solid var(--color-black);
+  }
+
+  .panel {
+    border-bottom: var(--frame-width) solid var(--color-black);
+    background: var(--color-black);
+    color: var(--color-paper);
+    padding: var(--space-m) var(--gutter) var(--space-l);
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  .panel ul {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0 0 var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  .panel a[data-menu-link] {
+    display: block;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #2a2a2a;
+    font-family: var(--font-display);
+    font-size: var(--title-s);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .panel a[data-menu-link]:hover {
+    color: var(--color-brand);
+  }
+
+  .panel__cta {
+    width: 100%;
+  }
+
+  @media (min-width: 62rem) {
+    .nav-desktop,
+    .phone {
+      display: block;
+    }
+
+    .burger {
+      display: none;
+    }
+
+    .panel {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const panel = document.querySelector<HTMLElement>("[data-menu-panel]");
+
+  if (toggle && panel) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      const label = toggle.querySelector(".visually-hidden");
+      if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    panel.querySelectorAll("[data-menu-link]").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // El panel es exclusivo de móvil: al pasar a escritorio se cierra.
+    const desktop = window.matchMedia("(min-width: 62rem)");
+    desktop.addEventListener("change", (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>

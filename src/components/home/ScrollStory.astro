@@ -1,0 +1,288 @@
+---
+import { Image } from "astro:assets";
+
+import cocteles from "../../assets/images/gallery/cocteles - copia.jpg";
+import gilda from "../../assets/images/gallery/gilda2 - copia.jpg";
+import yayo from "../../assets/images/gallery/yayo - copia.jpg";
+
+/*
+ * Las piezas fotográficas viven dentro de marcos (`.story__photo`) porque todavía
+ * no hay recortes con transparencia. Cuando existan los WebP recortados, basta con
+ * sustituir el contenido de cada `[data-story-piece]` por la imagen suelta y quitar
+ * `.story__photo` de ese nodo: el guion de scroll anima el contenedor, no la imagen.
+ */
+
+const photos = [
+  {
+    image: cocteles,
+    alt: "Tres cócteles servidos en vaso corto y largo sostenidos con las dos manos",
+    label: "Cocktails",
+  },
+  {
+    image: gilda,
+    alt: "Bandeja metálica con gildas de anchoa y encurtidos sobre cartas del bar",
+    label: "Conservas",
+  },
+  {
+    image: yayo,
+    alt: "Cliente mayor con gafas de sol comiéndose una gilda en el bar",
+    label: "Amigos",
+  },
+];
+---
+
+<section class="story" id="historia" aria-labelledby="story-titulo">
+  <div class="story__track" data-story-track>
+    <div class="story__stage" data-story>
+      <p class="story__backdrop" aria-hidden="true">Glops</p>
+
+      <div class="container story__inner">
+        <h2 class="story__title" id="story-titulo">De la barra<br />a la mesa</h2>
+
+        <div class="story__pieces">
+          {
+            photos.map((photo, index) => (
+              <figure class={`story__piece story__photo story__photo--${index + 1}`} data-story-piece>
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  widths={[280, photo.image.width]}
+                  sizes="(min-width: 62rem) 17rem, (min-width: 48rem) 30vw, 45vw"
+                  loading="lazy"
+                />
+                <figcaption class="story__label">{photo.label}</figcaption>
+              </figure>
+            ))
+          }
+
+          <div class="story__piece story__checker checker" data-story-piece aria-hidden="true"></div>
+
+          <p class="story__piece stamp story__stamp" data-story-piece>Cabina abierta</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story {
+    background: var(--color-black);
+    color: var(--color-paper);
+    /* `clip` recorta sin crear contenedor de scroll, que rompería el sticky interior. */
+    overflow-x: clip;
+  }
+
+  .story__stage {
+    padding-block: var(--space-xl);
+  }
+
+  .story__backdrop {
+    display: none;
+  }
+
+  .story__inner {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .story__title {
+    margin: 0;
+    font-size: var(--title-m);
+    text-align: center;
+  }
+
+  /*
+   * Collage estático (móvil, tableta y movimiento reducido). En móvil las fotos van
+   * a dos columnas, alternando lado, para que la sección no se alargue en exceso.
+   */
+  .story__pieces {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-m) var(--space-s);
+    align-items: start;
+  }
+
+  .story__photo {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    border: var(--frame-width) solid var(--color-paper);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+  }
+
+  .story__photo :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .story__label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.3em 0.7em;
+    background: var(--color-black);
+    color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .story__photo--1 {
+    grid-area: 1 / 1;
+  }
+
+  .story__photo--2 {
+    grid-area: 1 / 2;
+    margin-top: var(--space-xl);
+  }
+
+  .story__photo--3 {
+    grid-area: 3 / 1;
+  }
+
+  .story__checker {
+    --checker-color: var(--color-paper);
+    --checker-size: 12px;
+    grid-area: 2 / 1 / 3 / -1;
+    width: 100%;
+    height: 12px;
+  }
+
+  .story__stamp {
+    grid-area: 3 / 2;
+    width: 7rem;
+    justify-self: center;
+    align-self: center;
+  }
+
+  @media (min-width: 48rem) {
+    .story__pieces {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-l) var(--space-m);
+    }
+
+    .story__photo--2 {
+      margin-top: var(--space-l);
+    }
+
+    .story__photo--3 {
+      grid-area: 1 / 3;
+    }
+
+    .story__stamp {
+      grid-area: 3 / 2;
+      align-self: start;
+    }
+  }
+
+  /*
+   * Escenario animado: solo en escritorio y con movimiento permitido.
+   * La altura de `.story__track` es el recorrido total de scroll de la escena; el
+   * guion (`scripts/animations/scroll-story.ts`) reparte su línea de tiempo sobre
+   * ese recorrido. El escenario queda fijo durante `height - 100vh` y, al agotarse,
+   * la siguiente sección aparece justo debajo sin tramo vacío.
+   */
+  @media (min-width: 62rem) and (prefers-reduced-motion: no-preference) {
+    .story__track {
+      height: 240vh;
+    }
+
+    .story__stage {
+      position: sticky;
+      top: 0;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      padding-block: 0;
+      overflow: hidden;
+    }
+
+    .story__backdrop {
+      display: block;
+      position: absolute;
+      inset: auto 0 -4vh 0;
+      margin: 0;
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-size: 34vw;
+      font-weight: 700;
+      line-height: 0.8;
+      letter-spacing: -0.02em;
+      opacity: 0.05;
+      text-align: center;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .story__inner {
+      position: relative;
+      display: block;
+      height: 100%;
+    }
+
+    /* El título ocupa el hueco central que dejan libre las piezas. */
+    .story__title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      width: min(30rem, 40vw);
+      translate: -50% -50%;
+    }
+
+    .story__pieces {
+      display: block;
+      height: 100%;
+    }
+
+    .story__piece {
+      position: absolute;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .story__photo {
+      width: 16rem;
+    }
+
+    .story__photo--1 {
+      top: 8%;
+      left: 0;
+    }
+
+    .story__photo--2 {
+      top: 6%;
+      right: 0;
+      margin-top: 0;
+      width: 14rem;
+    }
+
+    .story__photo--3 {
+      bottom: 6%;
+      left: 8%;
+      width: 13rem;
+    }
+
+    .story__checker {
+      right: 6%;
+      bottom: 30%;
+      width: 22rem;
+      height: 14px;
+    }
+
+    .story__stamp {
+      right: 12%;
+      bottom: 10%;
+      width: 8rem;
+    }
+  }
+</style>
+
+<script>
+  import { initScrollStory } from "../../scripts/animations/scroll-story";
+
+  const root = document.querySelector<HTMLElement>("[data-story]")?.closest("section");
+  if (root) initScrollStory(root);
+</script>

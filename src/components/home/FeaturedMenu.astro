@@ -1,0 +1,154 @@
+---
+import { featuredProducts, getCategoryLabel } from "../../data/menu";
+---
+
+<section class="featured" id="carta" aria-labelledby="carta-titulo">
+  <div class="container featured__inner">
+    <div class="featured__head">
+      <p class="eyebrow featured__eyebrow">De la carta</p>
+      <h2 id="carta-titulo">Cuatro<br />razones</h2>
+      <p class="featured__note">
+        Una muestra corta. La carta completa vive en su propia página, con buscador y filtros.
+      </p>
+      <a class="btn btn--brand featured__cta" href="/carta">Ver la carta completa</a>
+      <p class="stamp featured__stamp">Carta en revisión</p>
+    </div>
+
+    <ul class="featured__list">
+      {
+        featuredProducts.map((product) => (
+          <li class="featured__row" data-reveal>
+            <span class="featured__cat">{getCategoryLabel(product.category)}</span>
+            <span class="featured__name">{product.name}</span>
+            <span class="featured__dots" aria-hidden="true" />
+            <span class="featured__price">{product.priceLabel}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .featured {
+    padding-block: var(--space-2xl);
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .featured__inner {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .featured__eyebrow {
+    margin-bottom: var(--space-xs);
+    color: var(--color-brand);
+  }
+
+  .featured__note {
+    max-width: 34ch;
+    margin-top: var(--space-m);
+    color: #d8d5cd;
+  }
+
+  .featured__cta {
+    margin-top: var(--space-m);
+  }
+
+  .featured__list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid #2c2c2c;
+  }
+
+  .featured__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "cat cat"
+      "name price";
+    gap: 0.35rem 0.75rem;
+    align-items: baseline;
+    padding-block: var(--space-s);
+    border-bottom: 1px solid #2c2c2c;
+  }
+
+  .featured__cat {
+    grid-area: cat;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .featured__name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-size: var(--text-l);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .featured__dots {
+    display: none;
+  }
+
+  .featured__price {
+    grid-area: price;
+    font-family: var(--font-mono);
+    font-size: var(--text-m);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .featured__stamp {
+    width: 7rem;
+    margin-top: var(--space-l);
+    rotate: -7deg;
+  }
+
+  @media (min-width: 40rem) {
+    .featured__row {
+      grid-template-columns: 11rem 1fr auto;
+      grid-template-areas: "cat name dots price";
+      gap: var(--space-s);
+    }
+
+    .featured__dots {
+      display: block;
+      grid-area: dots;
+      align-self: center;
+      height: 0;
+      border-bottom: 2px dotted #4a4a4a;
+    }
+  }
+
+  @media (min-width: 62rem) {
+    .featured__inner {
+      grid-template-columns: 0.8fr 1.2fr;
+      align-items: start;
+      gap: var(--space-xl);
+    }
+
+    .featured__list {
+      border-top: 3px solid var(--color-paper);
+    }
+
+    .featured__stamp {
+      width: 8rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .featured__stamp {
+      rotate: none;
+    }
+  }
+</style>

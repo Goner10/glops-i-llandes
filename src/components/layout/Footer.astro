@@ -1,0 +1,180 @@
+---
+import { Image } from "astro:assets";
+
+import logoWhite from "../../assets/images/brand/TODO_2.png";
+import { site } from "../../config/site";
+
+interface Props {
+  /** Remate superior: damero en la portada, doble filete en la carta. */
+  strip?: "checker" | "rule";
+}
+
+const { strip = "checker" } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  {
+    strip === "checker" ? (
+      <div class="checker strip" aria-hidden="true" />
+    ) : (
+      <div class="strip strip--rule" aria-hidden="true" />
+    )
+  }
+
+  <div class="container inner">
+    <div class="mark">
+      <Image
+        src={logoWhite}
+        alt={site.name}
+        widths={[320, 480]}
+        sizes="(min-width: 48rem) 320px, 240px"
+        loading="lazy"
+      />
+      <p class="eyebrow claim">{site.claim}</p>
+    </div>
+
+    <div class="cols">
+      <section class="col">
+        <h2 class="col__title">Dónde</h2>
+        <address>
+          {site.address.street}<br />
+          {site.address.postalCode} {site.address.city}<br />
+          {site.address.neighbourhood}
+        </address>
+        <a class="link" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
+          Abrir en Google Maps
+        </a>
+      </section>
+
+      <section class="col">
+        <h2 class="col__title">Contacto</h2>
+        <a class="link link--big" href={site.phone.href}>{site.phone.display}</a>
+        <p class="note">{site.reservations.note}</p>
+      </section>
+
+      <section class="col">
+        <h2 class="col__title">Ir a</h2>
+        <ul>
+          {
+            site.nav.map((item) => (
+              <li>
+                <a class="link" href={item.href}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <p class="legal">
+      © {year} {site.name} · El Cabanyal, {site.address.city}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .strip.checker {
+    --checker-color: var(--color-paper);
+    --checker-size: 12px;
+    height: 12px;
+  }
+
+  .strip--rule {
+    height: 5px;
+    border-top: 1px solid var(--color-paper);
+    border-bottom: 1px solid var(--color-paper);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-l);
+    padding-block: var(--space-xl) var(--space-l);
+  }
+
+  .mark :global(img) {
+    width: min(240px, 60vw);
+    height: auto;
+  }
+
+  .claim {
+    margin-top: var(--space-s);
+    color: var(--color-brand);
+  }
+
+  .cols {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .col__title {
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-m);
+    letter-spacing: 0.1em;
+  }
+
+  address {
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    font-style: normal;
+    line-height: 1.8;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .link {
+    display: inline-block;
+    margin-top: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    text-decoration: none;
+    text-underline-offset: 4px;
+  }
+
+  .link:hover {
+    color: var(--color-brand);
+    text-decoration: underline;
+  }
+
+  .link--big {
+    font-size: var(--text-l);
+    letter-spacing: 0.04em;
+  }
+
+  .note {
+    max-width: 28ch;
+    margin-top: var(--space-xs);
+    font-size: var(--text-s);
+    color: var(--color-gray);
+  }
+
+  .legal {
+    padding-top: var(--space-m);
+    border-top: 1px solid #262626;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    color: var(--color-gray);
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 48rem) {
+    .cols {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-m);
+    }
+  }
+</style>

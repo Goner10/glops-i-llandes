@@ -1,0 +1,117 @@
+---
+import { Image } from "astro:assets";
+
+import rotulo from "../../assets/images/gallery/rotulo - copia.jpg";
+---
+
+<section class="manifesto" id="manifesto" aria-labelledby="manifesto-titulo">
+  <div class="container manifesto__inner">
+    <div class="manifesto__text" data-reveal>
+      <p class="tag tag--brand">La casa</p>
+      <h2 class="manifesto__title" id="manifesto-titulo">
+        En el corazón del Cabanyal<span class="manifesto__dots">...</span>
+      </h2>
+      <p class="manifesto__lead">
+        Entre fachadas modernistas y redes de pesca, nace Glops i Llandes. Aquí no venimos a
+        reinventar nada, sino a celebrar lo que ya funcionaba: mesas compartidas, brindis
+        espontáneos y sabores que despiertan recuerdos.
+      </p>
+      <p class="manifesto__closing">
+        Porque aquí no solo nos importa lo que servimos, sino la vibra que creamos.
+      </p>
+    </div>
+
+    <figure class="manifesto__figure" data-reveal data-reveal-delay="120">
+      <div class="frame manifesto__frame">
+        <Image
+          src={rotulo}
+          alt="Rótulo luminoso de Glops i Llandes en la fachada del local, de noche"
+          widths={[320, rotulo.width]}
+          sizes="(min-width: 62rem) 22rem, (min-width: 40rem) 45vw, 78vw"
+          loading="lazy"
+        />
+      </div>
+      <figcaption class="tag manifesto__caption">Martí Grajales, 15</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .manifesto {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+  }
+
+  .manifesto__inner {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  .manifesto__title {
+    max-width: 18ch;
+    margin-block: var(--space-s) var(--space-m);
+  }
+
+  /* Puntos decorativos, no texto informativo: el mostaza sobre papel se queda
+     en 2:1, así que aquí solo funciona como remate gráfico del titular. */
+  .manifesto__dots {
+    color: var(--color-brand);
+  }
+
+  .manifesto__lead {
+    max-width: 46ch;
+    font-size: var(--text-l);
+    line-height: 1.45;
+  }
+
+  .manifesto__closing {
+    max-width: 42ch;
+    margin-top: var(--space-m);
+    padding-left: var(--space-s);
+    border-left: var(--frame-width) solid var(--color-black);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+  }
+
+  .manifesto__figure {
+    position: relative;
+    width: min(22rem, 78vw);
+    margin: 0;
+    justify-self: center;
+  }
+
+  .manifesto__frame {
+    rotate: 1.5deg;
+  }
+
+  .manifesto__frame :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .manifesto__caption {
+    position: absolute;
+    bottom: -0.75rem;
+    left: -0.75rem;
+    background: var(--color-brand);
+    color: var(--color-black);
+  }
+
+  @media (min-width: 62rem) {
+    .manifesto__inner {
+      grid-template-columns: 1.15fr 0.85fr;
+    }
+
+    .manifesto__figure {
+      justify-self: end;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .manifesto__frame {
+      rotate: none;
+    }
+  }
+</style>

@@ -1,13 +1,27 @@
 ---
+import Events from "../components/home/Events.astro";
+import FeaturedMenu from "../components/home/FeaturedMenu.astro";
+import Gallery from "../components/home/Gallery.astro";
+import Hero from "../components/home/Hero.astro";
+import Location from "../components/home/Location.astro";
+import Manifesto from "../components/home/Manifesto.astro";
+import Reservations from "../components/home/Reservations.astro";
+import ReviewsPreview from "../components/home/ReviewsPreview.astro";
+import ScrollStory from "../components/home/ScrollStory.astro";
+import { site } from "../config/site";
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout
-  title="Glops i Llandes"
-  description="Bar y restaurante Glops i Llandes en Paterna."
->
-  <main>
-    <h1>Glops i Llandes</h1>
-    <p>Nueva web en construcción.</p>
+<Layout title={`${site.name} · Bar de tapas y cócteles en el Cabanyal`}>
+  <main id="contenido">
+    <Hero />
+    <Manifesto />
+    <ScrollStory />
+    <Gallery />
+    <FeaturedMenu />
+    <Events />
+    <ReviewsPreview />
+    <Reservations />
+    <Location />
   </main>
 </Layout>

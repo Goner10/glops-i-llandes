@@ -1,0 +1,251 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+import berberechos from "../../assets/images/gallery/berberechos - copia.jpg";
+import champagne from "../../assets/images/gallery/champagne - copia.jpg";
+import quesos from "../../assets/images/gallery/quesos - copia.jpg";
+import risas from "../../assets/images/gallery/risas - copia.jpg";
+import { site } from "../../config/site";
+
+interface PhotoBlock {
+  kind: "photo";
+  slot: string;
+  image: ImageMetadata;
+  alt: string;
+  tag: string;
+  ratio: string;
+  sizes: string;
+}
+
+interface PosterBlock {
+  kind: "poster";
+  slot: string;
+}
+
+type GalleryBlock = PhotoBlock | PosterBlock;
+
+const blocks: GalleryBlock[] = [
+  {
+    kind: "photo",
+    slot: "a",
+    image: risas,
+    alt: "Tres personas del equipo compartiendo tapas y vino alrededor de una mesa de mármol",
+    tag: "Mesa compartida",
+    ratio: "4 / 5",
+    sizes: "(min-width: 62rem) 36rem, (min-width: 44rem) 48vw, 92vw",
+  },
+  {
+    kind: "photo",
+    slot: "b",
+    image: champagne,
+    alt: "Botella sirviendo champán sobre una torre de copas apoyada en una silla amarilla",
+    tag: "Brindis",
+    ratio: "2 / 3",
+    sizes: "(min-width: 62rem) 24rem, (min-width: 44rem) 48vw, 92vw",
+  },
+  { kind: "poster", slot: "c" },
+  {
+    kind: "photo",
+    slot: "d",
+    image: quesos,
+    alt: "Tabla de quesos con nueces y uvas sobre las cartas impresas del bar",
+    tag: "Tabla",
+    ratio: "1 / 1",
+    sizes: "(min-width: 62rem) 20rem, (min-width: 44rem) 48vw, 92vw",
+  },
+  {
+    kind: "photo",
+    slot: "e",
+    image: berberechos,
+    alt: "Bol de patatas con mejillones aliñándose con una salsa desde un biberón de cocina",
+    tag: "Conserva",
+    ratio: "2 / 3",
+    sizes: "(min-width: 62rem) 20rem, (min-width: 44rem) 48vw, 92vw",
+  },
+ 
+];
+
+const claimParts = site.claim.split(" · ");
+---
+
+<section class="gallery" id="galeria" aria-labelledby="galeria-titulo">
+  <div class="gallery__head">
+    <p class="tag tag--brand">Álbum</p>
+    <h2 id="galeria-titulo">Lo que pasa<br />en la barra</h2>
+  </div>
+
+  <div class="gallery__grid">
+    {
+      blocks.map((block, index) =>
+        block.kind === "photo" ? (
+          <figure
+            class="gallery__item"
+            data-slot={block.slot}
+            data-reveal
+            data-reveal-delay={String(index * 60)}
+          >
+            <div class="frame gallery__frame" style={`--ratio: ${block.ratio}`}>
+              <Image
+                src={block.image}
+                alt={block.alt}
+                widths={[320, block.image.width]}
+                sizes={block.sizes}
+                loading="lazy"
+              />
+            </div>
+            <figcaption class="tag gallery__tag">{block.tag}</figcaption>
+          </figure>
+        ) : (
+          <div class="gallery__poster" data-slot={block.slot} data-reveal>
+            <div class="checker gallery__poster-strip" aria-hidden="true" />
+            <ul class="gallery__claim">
+              {claimParts.map((part) => (
+                <li>{part}</li>
+              ))}
+            </ul>
+            <p class="gallery__poster-note">
+              Fotografía directa, flash y nada de postureo. El álbum crece cada semana.
+            </p>
+          </div>
+        ),
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .gallery {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+  }
+
+  .gallery__head,
+  .gallery__grid {
+    width: 100%;
+    max-width: 68rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .gallery__head {
+    margin-bottom: var(--space-l);
+  }
+
+  .gallery__head > .tag {
+    margin-bottom: var(--space-xs);
+  }
+
+  .gallery__grid {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .gallery__item {
+    position: relative;
+    margin: 0;
+  }
+
+  .gallery__frame {
+    position: relative;
+    aspect-ratio: var(--ratio);
+  }
+
+  .gallery__frame :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery__tag {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .gallery__poster {
+    display: grid;
+    align-content: center;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .gallery__poster-strip {
+    --checker-color: var(--color-brand);
+    --checker-size: 12px;
+    height: 12px;
+  }
+
+  .gallery__claim {
+    display: grid;
+    gap: 0.1em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-display);
+    font-size: var(--title-s);
+    font-weight: 700;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .gallery__claim li:nth-child(even) {
+    color: var(--color-brand);
+  }
+
+  .gallery__poster-note {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--color-gray);
+  }
+
+  @media (min-width: 44rem) {
+    .gallery__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 62rem) {
+    .gallery__grid {
+      grid-template-columns: repeat(12, 1fr);
+      align-items: start;
+    }
+
+    [data-slot="a"] {
+      grid-column: span 7;
+    }
+
+    [data-slot="b"] {
+      grid-column: span 5;
+      margin-top: var(--space-l);
+    }
+
+    [data-slot="c"] {
+      grid-column: span 4;
+    }
+
+    [data-slot="d"] {
+      grid-column: span 4;
+    }
+
+    [data-slot="e"] {
+      grid-column: span 4;
+      margin-top: var(--space-m);
+    }
+
+    [data-slot="f"] {
+      grid-column: span 5;
+    }
+
+    [data-slot="g"] {
+      grid-column: span 7;
+      align-self: end;
+    }
+  }
+</style>

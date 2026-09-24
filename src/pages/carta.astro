@@ -1,0 +1,141 @@
+---
+import MenuExplorer from "../components/menu/MenuExplorer";
+import { site } from "../config/site";
+import Layout from "../layouts/Layout.astro";
+
+// La franja se repite lo justo para cruzar la pantalla más ancha sin animarse.
+const tickerRepeats = 8;
+---
+
+<Layout
+  title={`Carta · ${site.name}`}
+  description="Carta de Glops i Llandes: aperitivos, conservas, platos para compartir, cócteles y postres."
+  strip="rule"
+>
+  <main id="contenido">
+    <section class="carta-head" aria-labelledby="carta-titulo">
+      <div class="container carta-head__inner">
+        <p class="eyebrow carta-head__eyebrow">Carta</p>
+        <h1 id="carta-titulo">Comer,<br />beber, repetir</h1>
+        <p class="carta-head__text">
+          Conservas, tapas de barra y cócteles de autoría. <br> Al lado del mercado del Cabanyal.
+        </p>
+        <p class="carta-head__warning">
+          <span class="tag tag--brand">Provisional</span>
+          Esta selección está pendiente de revisión con el local.
+        </p>
+      </div>
+
+      <div class="carta-ticker" aria-hidden="true">
+        {
+          Array.from({ length: tickerRepeats }, () => (
+            <span class="carta-ticker__item">Comer · Beber · Compartir · Repetir</span>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="carta-body" aria-label="Explorador de la carta">
+      <div class="container">
+        <MenuExplorer client:visible />
+      </div>
+    </section>
+
+    <section class="carta-cta" aria-labelledby="carta-cta-titulo">
+      <div class="container carta-cta__inner">
+        <h2 id="carta-cta-titulo">¿Nos vemos<br />en la barra?</h2>
+        <div class="carta-cta__actions">
+          <a class="btn btn--brand" href={site.phone.href}>Llamar {site.phone.display}</a>
+          <a class="btn carta-cta__ghost" href="/#ubicacion">Cómo llegar</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .carta-head {
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .carta-head__inner {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-m);
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  .carta-head__eyebrow {
+    color: var(--color-brand);
+  }
+
+  .carta-head__text {
+    max-width: 40ch;
+    color: #d8d5cd;
+  }
+
+  .carta-head__warning {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    max-width: 48ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+    color: var(--color-gray);
+  }
+
+  /* Remate del hero: una línea de texto fina, no otro patrón geométrico. */
+  .carta-ticker {
+    display: flex;
+    gap: 1.5rem;
+    padding-block: 0.4rem;
+    border-top: 1px solid var(--color-brand);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+    overflow: hidden;
+  }
+
+  .carta-ticker__item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .carta-body {
+    padding-block: var(--space-xl);
+    background: var(--color-paper);
+  }
+
+  .carta-cta {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+    border-top: var(--frame-width) solid var(--color-black);
+  }
+
+  .carta-cta__inner {
+    display: grid;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .carta-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+
+  .carta-cta__ghost {
+    background: transparent;
+    color: var(--color-black);
+  }
+
+  @media (min-width: 62rem) {
+    .carta-cta__inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

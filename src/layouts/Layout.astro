@@ -1,29 +1,51 @@
 ---
+import { Font } from "astro:assets";
+
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import { site } from "../config/site";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
+  /** Remate del header y del footer. La carta prescinde del damero. */
+  strip?: "checker" | "rule";
 }
 
-const {
-  title,
-  description = "Glops i Llandes, bar y restaurante en Paterna."
-} = Astro.props;
+const { title, description = site.description, strip = "checker" } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+
+    <Font cssVariable="--font-oswald" preload />
+    <Font cssVariable="--font-archivo" preload />
+    <Font cssVariable="--font-plex-mono" />
 
     <title>{title}</title>
   </head>
 
   <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <Header strip={strip} />
     <slot />
+    <Footer strip={strip} />
+
+    <script>
+      import { initReveal } from "../scripts/animations/reveal";
+
+      initReveal();
+    </script>
   </body>
 </html>

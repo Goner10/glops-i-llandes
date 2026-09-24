@@ -1,0 +1,152 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image, getImage } from "astro:assets";
+
+interface Props {
+  /** Imagen obligatoria: hace de fallback y de `poster` del vídeo. */
+  poster: ImageMetadata;
+  alt: string;
+  /** Ruta pública del MP4 para pantallas estrechas (vertical), p. ej. `/videos/hero-mobile.mp4`. */
+  videoMobile?: string | null;
+  /** Ruta pública del MP4 para escritorio (horizontal), p. ej. `/videos/hero-desktop.mp4`. */
+  videoDesktop?: string | null;
+  /** Relación de aspecto del marco, para que no haya saltos de layout. */
+  ratio?: string;
+  /** Relación de aspecto a partir del breakpoint de escritorio (62rem). Por defecto, la misma. */
+  ratioDesktop?: string;
+  widths?: number[];
+  sizes?: string;
+  loading?: "eager" | "lazy";
+}
+
+const {
+  poster,
+  alt,
+  videoMobile = null,
+  videoDesktop = null,
+  ratio = "4 / 5",
+  ratioDesktop = ratio,
+  widths = [poster.width],
+  sizes = "100vw",
+  loading = "eager",
+} = Astro.props;
+
+const hasVideo = Boolean(videoMobile || videoDesktop);
+
+// El poster solo se genera si de verdad hay un vídeo que lo necesite.
+const posterUrl = hasVideo
+  ? (await getImage({ src: poster, width: Math.min(poster.width, 1280), format: "jpeg" })).src
+  : undefined;
+---
+
+<div class="hero-media" style={`--ratio: ${ratio}; --ratio-desktop: ${ratioDesktop}`}>
+  <Image
+    class="hero-media__image"
+    src={poster}
+    alt={alt}
+    widths={widths}
+    sizes={sizes}
+    loading={loading}
+    fetchpriority={loading === "eager" ? "high" : undefined}
+  />
+
+  {
+    hasVideo && (
+      <video
+        class="hero-media__video"
+        poster={posterUrl}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="none"
+        tabindex="-1"
+        aria-hidden="true"
+        data-hero-video
+        data-src-mobile={videoMobile ?? undefined}
+        data-src-desktop={videoDesktop ?? undefined}
+      />
+    )
+  }
+</div>
+
+<style>
+  .hero-media {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    background: var(--color-black);
+  }
+
+  .hero-media__image,
+  .hero-media__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Encuadre del recorte; ajustar por breakpoint si el motivo no está centrado. */
+    object-position: 50% 50%;
+  }
+
+  .hero-media__video {
+    opacity: 0;
+    transition: opacity 0.5s linear;
+  }
+
+  /* Solo tapa la imagen cuando el vídeo ya está reproduciéndose. */
+  .hero-media__video.is-playing {
+    opacity: 1;
+  }
+
+  /* Mismo breakpoint que el cambio de fuente en el script y que Hero.astro. */
+  @media (min-width: 62rem) {
+    .hero-media {
+      aspect-ratio: var(--ratio-desktop);
+    }
+  }
+</style>
+
+<script>
+  // Debe coincidir con la media query de `.hero-media` y con el breakpoint de Hero.astro.
+  const DESKTOP_QUERY = "(min-width: 62rem)";
+
+  const videos = document.querySelectorAll<HTMLVideoElement>("[data-hero-video]");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const desktop = window.matchMedia(DESKTOP_QUERY);
+
+  for (const video of videos) {
+    // Con movimiento reducido no se descarga ni un byte de vídeo: queda la imagen.
+    if (reduceMotion.matches) continue;
+
+    const { srcMobile, srcDesktop } = video.dataset;
+    if (!srcMobile && !srcDesktop) continue;
+
+    let current: string | undefined;
+
+    // Cada dispositivo descarga solo su vídeo; si falta uno, se usa el otro.
+    const pick = () => (desktop.matches ? srcDesktop || srcMobile : srcMobile || srcDesktop);
+
+    const showImage = () => video.classList.remove("is-playing");
+
+    const sync = () => {
+      const next = pick();
+      // Sin cambio de ruta no hay recarga: evita descargas duplicadas al redimensionar.
+      if (!next || next === current) return;
+
+      current = next;
+      showImage();
+      video.src = next;
+      video.load();
+      void video.play().catch(showImage);
+    };
+
+    video.addEventListener("playing", () => video.classList.add("is-playing"));
+    // Si el archivo no carga o el navegador bloquea la reproducción, se queda la imagen.
+    video.addEventListener("error", showImage);
+    video.preload = "metadata";
+
+    sync();
+    desktop.addEventListener("change", sync);
+  }
+</script>

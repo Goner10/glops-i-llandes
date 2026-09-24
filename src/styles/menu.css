@@ -1,0 +1,441 @@
+/* Estilos de la isla React de la carta. Se cargan solo con `MenuExplorer`. */
+
+.menu-explorer {
+  display: grid;
+  gap: var(--space-l);
+}
+
+/* Filtros */
+
+.menu-filters {
+  display: grid;
+  gap: var(--space-s);
+  padding-bottom: var(--space-s);
+  /* Doble filete fino en lugar del damero. */
+  border-bottom: 3px double var(--color-black);
+}
+
+/*
+ * Carril horizontal de categorías. En móvil sangra hasta el borde de la
+ * pantalla para que la primera y la última no queden pegadas al viewport; el
+ * `overflow` propio impide que ese sangrado desborde la página.
+ */
+.menu-filters__categories {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2xs);
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  /* Hueco para que el anillo de foco no se recorte contra el borde del carril. */
+  margin-block: -0.5rem;
+  padding-block: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.menu-filters__categories::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-filters__chip {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-black);
+  font-family: var(--font-mono);
+  font-size: var(--text-s);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu-filters__chip:hover {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-black);
+}
+
+.menu-filters__chip[aria-pressed="true"] {
+  background: var(--color-black);
+  color: var(--color-paper);
+}
+
+.menu-filters__count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #4a4a46;
+}
+
+@media (min-width: 48rem) {
+  .menu-filters {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--space-m);
+  }
+
+  /* En escritorio caben en una línea y no hace falta el sangrado del carril. */
+  .menu-filters__categories {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+/* Rejilla */
+
+.product-grid {
+  display: grid;
+  /* Dos columnas fijas: con `auto-fill` y un mínimo en `rem` la rejilla podía
+     caer a una sola columna justo por debajo de 380 px. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 34rem) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: var(--space-m);
+  }
+}
+
+/* Tarjeta */
+
+.product-card {
+  display: grid;
+}
+
+/* Un solo marco negro envuelve fotografía, nombre, precio y alérgenos. */
+.product-card__button {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  padding: 0;
+  border: var(--frame-width) solid var(--color-black);
+  border-radius: var(--radius-m);
+  background: var(--color-paper);
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/*
+ * La proporción la fija el contenedor y su contenido va fuera de flujo: así la
+ * altura no depende ni de la foto ni del hueco, y todas las fichas de una fila
+ * arrancan el texto a la misma altura.
+ */
+.product-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+}
+
+.product-card__media > .product-card__image,
+.product-card__media > .product-ph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.product-card__image {
+  object-fit: cover;
+  /* El motivo vive en la mitad baja del encuadre vertical. */
+  object-position: 50% 58%;
+}
+
+/* Filete fino entre la fotografía y la información. */
+.product-card__body {
+  display: grid;
+  /* El nombre crece hacia arriba y el pie queda anclado abajo. */
+  grid-template-rows: 1fr auto;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border-top: 2px solid var(--color-black);
+  background: var(--color-paper);
+  transition: background-color 0.15s linear;
+}
+
+/* Inversión: el mostaza como texto sobre papel se queda en 2:1. */
+.product-card__button:hover .product-card__body,
+.product-card__button:focus-visible .product-card__body {
+  background: var(--color-brand);
+}
+
+.product-card__name {
+  font-family: var(--font-display);
+  /* Se estrecha en móvil para que quepan dos columnas sin desbordar. */
+  font-size: clamp(0.95rem, 0.72rem + 1vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Precio en una línea y alérgenos en la siguiente. Sin alérgenos no se pinta
+ * la segunda línea, así que tampoco hay hueco que reservar.
+ */
+.product-card__foot {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.product-card__price {
+  font-family: var(--font-mono);
+  font-size: var(--text-s);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+@media (min-width: 34rem) {
+  .product-card__body {
+    gap: var(--space-s);
+    padding: var(--space-s);
+  }
+}
+
+/* Hueco sin fotografía */
+
+.product-ph {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-xs);
+  aspect-ratio: var(--ph-ratio, 4 / 5);
+  /* Poco margen lateral: el sello va recortado con clip-path y necesita ancho
+     para que «PRÓXIMAMENTE» quepa entre las puntas. */
+  padding: var(--space-s) var(--space-xs);
+  background: var(--color-paper);
+  overflow: hidden;
+}
+
+.product-ph .product-ph__name {
+  font-family: var(--font-display);
+  font-size: var(--text-m);
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-black);
+}
+
+/* Corte punteado, como el de un ticket. */
+.product-ph__cut {
+  width: 100%;
+  border-top: 2px dotted var(--color-black);
+}
+
+/* El clip-path del sello recorta: el texto se ajusta al ancho útil disponible. */
+.product-ph .product-ph__stamp {
+  width: min(64%, 6.25rem);
+  font-size: 0.55rem;
+  letter-spacing: 0.01em;
+  rotate: -5deg;
+}
+
+/* En el modal el hueco se lee aislado, sin el marco de la tarjeta alrededor. */
+.product-ph--modal {
+  border: var(--frame-width) solid var(--color-black);
+  border-radius: var(--radius-m);
+}
+
+.product-ph--modal .product-ph__name {
+  font-size: var(--text-l);
+}
+
+.product-ph--modal .product-ph__stamp {
+  width: min(50%, 8rem);
+  font-size: 0.7rem;
+}
+
+/* Alérgenos */
+
+/*
+ * Una sola fila siempre: `grid-auto-flow: column` impide el salto de línea y
+ * las pistas, con mínimo 0, se comprimen al unísono cuando no caben cuatro
+ * iconos. Con dos o tres se quedan en su tope y no se estiran.
+ */
+.allergens--card {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 2.5rem);
+  justify-content: start;
+  gap: var(--space-2xs);
+  width: 100%;
+}
+
+/* El alto lo deduce el navegador de la proporción del SVG: nunca se deforma. */
+.allergens--card .allergens__icon {
+  width: 100%;
+  height: auto;
+}
+
+.allergens-block {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-xs);
+  width: 100%;
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--color-black);
+}
+
+.allergens__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.allergens--modal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* En el modal el icono va más grande, con su nombre ya dibujado dentro. */
+.allergens__item {
+  width: 4rem;
+}
+
+.allergens--modal .allergens__icon {
+  width: 100%;
+  height: auto;
+}
+
+/* Modal */
+
+.product-modal {
+  width: min(56rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: var(--frame-width) solid var(--color-black);
+  border-radius: var(--radius-l);
+  background: var(--color-paper);
+  color: var(--color-black);
+  overflow: auto;
+}
+
+.product-modal::backdrop {
+  background: rgb(10 10 10 / 0.82);
+}
+
+.product-modal__panel {
+  position: relative;
+  display: grid;
+  gap: var(--space-m);
+  padding: var(--space-m);
+}
+
+.product-modal__close {
+  position: absolute;
+  top: var(--space-s);
+  right: var(--space-s);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-m);
+  background: var(--color-paper);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.product-modal__close:hover {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-black);
+}
+
+.product-modal__media {
+  max-width: 22rem;
+}
+
+/* 3/4 es la proporción nativa de las fotos de producto: se ven sin recorte. */
+.product-modal__image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  border: var(--frame-width) solid var(--color-black);
+  border-radius: var(--radius-m);
+  object-fit: cover;
+}
+
+.product-modal__body {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-s);
+  align-content: start;
+}
+
+.product-modal__title {
+  font-size: var(--title-m);
+}
+
+.product-modal__price {
+  padding: 0.3em 0.7em;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-s);
+  font-family: var(--font-mono);
+  font-size: var(--text-l);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Texto de lectura, no un aviso: fuente de cuerpo y negro pleno. */
+.product-modal__description {
+  max-width: 44ch;
+  font-size: var(--text-m);
+  line-height: 1.6;
+}
+
+.product-modal__cut {
+  width: 100%;
+  border-top: 2px dotted var(--color-black);
+}
+
+@media (min-width: 40rem) {
+  .product-modal__panel {
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: var(--space-l);
+    padding: var(--space-l);
+  }
+
+  .product-modal__media {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__body {
+    transition: none;
+  }
+
+  .product-ph .product-ph__stamp {
+    rotate: none;
+  }
+}

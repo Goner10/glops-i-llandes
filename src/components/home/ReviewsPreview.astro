@@ -1,0 +1,122 @@
+---
+import { site } from "../../config/site";
+
+// Bloque provisional: no se publican reseñas, autores ni puntuaciones hasta que
+// haya opiniones reales conectadas.
+---
+
+<section class="reviews" aria-labelledby="reseñas-titulo">
+  <div class="container reviews__inner">
+    <div class="reviews__head">
+      <p class="tag tag--brand">Reseñas</p>
+      <h2 id="reseñas-titulo">Lo que se dice<br />en las redes</h2>
+    </div>
+
+    <blockquote class="reviews__quote" data-reveal>
+      <p class="reviews__mark" aria-hidden="true">“</p>
+      <p class="reviews__text">
+        Aquí no solo nos importa lo que servimos, sino la vibra que creamos.
+      </p>
+      <footer class="reviews__source">Glops i Llandes</footer>
+    </blockquote>
+
+    <div class="reviews__pending">
+      <p class="stamp stamp--black reviews__stamp">Sin publicar</p>
+      <p class="reviews__note">
+        Todavía no mostramos opiniones en la web. Cuando conectemos las reseñas reales del local,
+        se verán aquí tal cual, sin selección ni retoques.
+      </p>
+      <a class="btn btn--ghost" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
+        Ver el local en Google
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+  }
+
+  .reviews__inner {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .reviews__head > .tag {
+    margin-bottom: var(--space-xs);
+  }
+
+  .reviews__quote {
+    margin: 0;
+    padding: var(--space-m);
+    border: var(--frame-width) solid var(--color-black);
+    border-radius: var(--radius-m);
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .reviews__mark {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    line-height: 0.6;
+    color: var(--color-brand);
+  }
+
+  .reviews__text {
+    margin-top: var(--space-s);
+    font-family: var(--font-display);
+    font-size: var(--title-s);
+    font-weight: 500;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  .reviews__source {
+    margin-top: var(--space-m);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .reviews__pending {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-s);
+  }
+
+  .reviews__stamp {
+    width: 6rem;
+  }
+
+  .reviews__note {
+    max-width: 42ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+  }
+
+  @media (min-width: 62rem) {
+    .reviews__inner {
+      grid-template-columns: 0.9fr 1.1fr;
+      align-items: start;
+      column-gap: var(--space-xl);
+    }
+
+    .reviews__head {
+      grid-column: 1;
+    }
+
+    .reviews__quote {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+
+    .reviews__pending {
+      grid-column: 1;
+    }
+  }
+</style>

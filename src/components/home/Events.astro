@@ -1,0 +1,129 @@
+---
+import { editorialPillars, events } from "../../data/events";
+
+// Todavía no hay carteles ni fechas confirmadas: mientras `events` esté vacío se
+// muestra la pieza editorial, sin inventar programación.
+const hasEvents = events.length > 0;
+---
+
+<section class="events" id="eventos" aria-labelledby="eventos-titulo">
+  <div class="container events__inner">
+    <div class="events__head">
+      <p class="tag tag--brand">En la casa</p>
+      <h2 id="eventos-titulo">Arte, música<br />y colabos</h2>
+    </div>
+
+    {
+      hasEvents ? (
+        <ul class="events__list">
+          {events.map((event) => (
+            <li class="events__item" data-reveal>
+              <p class="tag">{event.kind}</p>
+              <h3 class="events__title">{event.title}</h3>
+              <p class="events__meta">
+                <time datetime={event.date}>{event.date}</time> · {event.time}
+              </p>
+              <p class="events__detail">{event.detail}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul class="events__list">
+          {editorialPillars.map((pillar) => (
+            <li class="events__item" data-reveal>
+              <p class="tag tag--brand">{pillar.label}</p>
+              <h3 class="events__title">{pillar.title}</h3>
+              <p class="events__detail">{pillar.text}</p>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      !hasEvents && (
+        <p class="events__pending">
+          <span class="tag tag--outline">Agenda</span>
+          El próximo cartel se anuncia en el bar y en redes. Cuando haya fechas confirmadas,
+          aparecerán aquí.
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .events {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+    border-top: var(--frame-width) solid var(--color-black);
+  }
+
+  .events__inner {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .events__head > .tag {
+    margin-bottom: var(--space-xs);
+  }
+
+  .events__list {
+    display: grid;
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .events__item {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    padding: var(--space-m);
+    border: var(--frame-width) solid var(--color-black);
+    border-radius: var(--radius-m);
+    background: var(--color-white);
+  }
+
+  .events__title {
+    font-size: var(--title-s);
+  }
+
+  .events__meta {
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    letter-spacing: 0.06em;
+  }
+
+  .events__detail {
+    max-width: 34ch;
+    font-size: var(--text-s);
+    line-height: 1.6;
+  }
+
+  .events__pending {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    max-width: 52ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+    color: #4a4a46;
+  }
+
+  @media (min-width: 48rem) {
+    .events__list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .events__item:nth-child(2) {
+      margin-top: var(--space-m);
+    }
+
+    .events__item:nth-child(3) {
+      margin-top: calc(var(--space-m) * 2);
+    }
+  }
+</style>

@@ -1,0 +1,82 @@
+:root {
+  /* Paleta */
+  --color-black: #0a0a0a;
+  --color-paper: #f6f3eb;
+  --color-white: #ffffff;
+  --color-gray: #a7a7a2;
+  /*
+   * Único acento de marca. Sobre él siempre va texto negro (8,97:1); en blanco
+   * se queda en 2,3:1. Y nunca como texto sobre papel, donde solo da 2:1.
+   */
+  --color-brand: #e2a300;
+
+  /* Tipografías (las variables --font-* las genera la Fonts API de Astro) */
+  --font-display: var(--font-oswald);
+  --font-body: var(--font-archivo);
+  --font-mono: var(--font-plex-mono);
+
+  /* Escala tipográfica fluida */
+  --text-xs: clamp(0.7rem, 0.68rem + 0.1vw, 0.78rem);
+  --text-s: clamp(0.85rem, 0.83rem + 0.12vw, 0.94rem);
+  --text-m: clamp(1rem, 0.96rem + 0.2vw, 1.12rem);
+  --text-l: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --title-s: clamp(1.6rem, 1.35rem + 1.1vw, 2.25rem);
+  --title-m: clamp(2.1rem, 1.6rem + 2.3vw, 3.4rem);
+  --title-l: clamp(2.8rem, 1.7rem + 5vw, 6rem);
+
+  /* Ritmo */
+  --space-2xs: 0.375rem;
+  --space-xs: 0.625rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: clamp(3rem, 6vw, 5rem);
+  --space-2xl: clamp(4rem, 9vw, 7.5rem);
+
+  /* Formas */
+  --radius-s: 2px;
+  --radius-m: 6px;
+  --radius-l: 12px;
+  --radius-pill: 999px;
+  --frame-width: 3px;
+
+  /* Medidas */
+  --container: 78rem;
+  --container-narrow: 44rem;
+  --header-height: 4rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Damero */
+  --checker-size: 16px;
+
+  /* Sello dentado de 12 puntas */
+  --stamp-clip: polygon(
+    50% 0%,
+    60.48% 10.88%,
+    75% 6.7%,
+    78.64% 21.36%,
+    93.3% 25%,
+    89.12% 39.52%,
+    100% 50%,
+    89.12% 60.48%,
+    93.3% 75%,
+    78.64% 78.64%,
+    75% 93.3%,
+    60.48% 89.12%,
+    50% 100%,
+    39.52% 89.12%,
+    25% 93.3%,
+    21.36% 78.64%,
+    6.7% 75%,
+    10.88% 60.48%,
+    0% 50%,
+    10.88% 39.52%,
+    6.7% 25%,
+    21.36% 21.36%,
+    25% 6.7%,
+    39.52% 10.88%
+  );
+}

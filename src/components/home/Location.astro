@@ -1,0 +1,137 @@
+---
+import { Image } from "astro:assets";
+
+import boquerones from "../../assets/images/gallery/boquerones - copia.jpg";
+import { site } from "../../config/site";
+---
+
+<section class="location" id="ubicacion" aria-labelledby="ubicacion-titulo">
+  <div class="container location__inner">
+    <div class="location__data">
+      <p class="tag tag--brand">Dónde estamos</p>
+      <h2 id="ubicacion-titulo">El Cabanyal,<br />València</h2>
+
+      <address class="location__address">
+        <span class="location__street">{site.address.street}</span>
+        <span>{site.address.postalCode} {site.address.city}</span>
+      </address>
+
+      <div class="location__links">
+        <a class="btn" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
+          Cómo llegar
+        </a>
+        <a class="btn btn--ghost" href={site.phone.href}>{site.phone.display}</a>
+      </div>
+
+      <p class="location__pending">
+        <span class="tag tag--outline">Horarios</span>
+        Pendientes de confirmar con el local. Mientras tanto, lo más seguro es llamar.
+      </p>
+    </div>
+
+    <figure class="location__figure" data-reveal>
+      <div class="frame location__frame">
+        <Image
+          src={boquerones}
+          alt="Manos compartiendo boquerones en aceite y una tosta sobre la mesa de mármol del bar"
+          widths={[320, boquerones.width]}
+          sizes="(min-width: 62rem) 24rem, (min-width: 40rem) 45vw, 82vw"
+          loading="lazy"
+        />
+      </div>
+      <figcaption class="tag location__caption">Mesa de mármol</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .location {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+  }
+
+  .location__inner {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  .location__data > .tag {
+    margin-bottom: var(--space-xs);
+  }
+
+  .location__address {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: var(--space-m);
+    font-family: var(--font-mono);
+    font-size: var(--text-m);
+    font-style: normal;
+    letter-spacing: 0.02em;
+  }
+
+  .location__street {
+    font-family: var(--font-display);
+    font-size: var(--text-l);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .location__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-m);
+  }
+
+  .location__pending {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    max-width: 40ch;
+    margin-top: var(--space-m);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+    color: #4a4a46;
+  }
+
+  .location__figure {
+    position: relative;
+    width: min(24rem, 82vw);
+    margin: 0;
+    justify-self: center;
+  }
+
+  .location__frame {
+    rotate: -1.5deg;
+  }
+
+  .location__frame :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .location__caption {
+    position: absolute;
+    right: -0.5rem;
+    bottom: -0.75rem;
+  }
+
+  @media (min-width: 62rem) {
+    .location__inner {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .location__figure {
+      justify-self: end;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .location__frame {
+      rotate: none;
+    }
+  }
+</style>

@@ -1,0 +1,177 @@
+---
+import heroImage from "../../assets/images/home/barraGlops.jpeg";
+import { site } from "../../config/site";
+import HeroMedia from "./HeroMedia.astro";
+
+// Vídeos decorativos de `public/videos`: vertical por debajo de 62rem, horizontal a partir de ahí.
+const heroVideoMobile = "/videos/hero-mobile.mp4";
+const heroVideoDesktop = "/videos/hero-desktop.mp4";
+
+const claimParts = site.claim.split(" · ");
+---
+
+<section class="hero" aria-labelledby="hero-titulo">
+  <div class="container hero__inner">
+    <div class="hero__text">
+      <p class="eyebrow hero__where">
+        {site.address.neighbourhood} · {site.address.city}
+      </p>
+
+      <h1 class="hero__title" id="hero-titulo">
+        <span class="hero__line">Glops <span class="hero__i">i</span></span>
+        <span class="hero__line">Llandes</span>
+      </h1>
+
+      <p class="hero__claim">
+        {
+          claimParts.map((part, index) => (
+            <>
+              {index > 0 && <span class="hero__dot" aria-hidden="true">·</span>}
+              <span>{part}</span>
+            </>
+          ))
+        }
+      </p>
+
+      <p class="hero__lede">
+        Bar de tapas, conservas y cócteles en el Cabanyal.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--brand" href="/carta">Ver la carta</a>
+        <a class="btn hero__btn-reserva" href={site.reservations.url}>Reservar</a>
+      </div>
+    </div>
+
+    <div class="hero__media">
+      <div class="frame hero__frame">
+        <HeroMedia
+          poster={heroImage}
+          alt="Barra de Glops i Llandes con taburetes verdes y las botellas de la estantería al fondo"
+          videoMobile={heroVideoMobile}
+          videoDesktop={heroVideoDesktop}
+          ratio="4 / 5"
+          ratioDesktop="4 / 3"
+          widths={[400, 612]}
+          sizes="(min-width: 62rem) 520px, (min-width: 40rem) 60vw, 90vw"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="checker hero__strip" aria-hidden="true"></div>
+</section>
+
+<style>
+  .hero {
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  .hero__where {
+    color: var(--color-brand);
+  }
+
+  .hero__title {
+    margin-block: var(--space-s) var(--space-m);
+    font-size: var(--title-l);
+    line-height: 0.86;
+  }
+
+  .hero__line {
+    display: block;
+  }
+
+  .hero__i {
+    display: inline-block;
+    padding: 0 0.2em;
+    background: var(--color-brand);
+    color: var(--color-black);
+  }
+
+  .hero__claim {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    padding-block: var(--space-xs);
+    border-block: 2px solid var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .hero__dot {
+    color: var(--color-brand);
+  }
+
+  .hero__lede {
+    max-width: 34ch;
+    margin-top: var(--space-m);
+    color: #d8d5cd;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+
+  .hero__btn-reserva {
+    background: transparent;
+    border-color: var(--color-paper);
+    color: var(--color-paper);
+  }
+
+  .hero__media {
+    position: relative;
+    /* El ancho explícito evita que el marco colapse: el medio se posiciona en absoluto. */
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .hero__frame {
+    border-color: var(--color-paper);
+  }
+
+  .hero__stamp {
+    position: absolute;
+    right: -0.5rem;
+    bottom: -1.75rem;
+    width: 6.5rem;
+    rotate: -9deg;
+  }
+
+  .hero__strip {
+    --checker-color: var(--color-paper);
+    --checker-size: 14px;
+    height: 14px;
+  }
+
+  @media (min-width: 62rem) {
+    .hero__inner {
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: var(--space-xl);
+    }
+
+    .hero__media {
+      justify-self: end;
+      max-width: 33rem;
+    }
+
+    .hero__stamp {
+      right: -2rem;
+      bottom: -2.5rem;
+      width: 8rem;
+    }
+  }
+</style>
