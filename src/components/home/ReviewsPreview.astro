@@ -1,7 +1,8 @@
 ---
 import { site } from "../../config/site";
+import { googleRating, reviews } from "../../data/reviews";
 import type { Locale } from "../../i18n/locale";
-import { ui } from "../../i18n/ui";
+import { interpolate, ui } from "../../i18n/ui";
 
 interface Props {
   locale: Locale;
@@ -9,32 +10,190 @@ interface Props {
 
 const { locale } = Astro.props;
 const t = ui(locale);
+const numberLocale = locale === "es" ? "es-ES" : "en-GB";
+
+const averageLabel = googleRating.average.toLocaleString(numberLocale, {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+const totalLabel = interpolate(t.reviewsCount, {
+  n: googleRating.total.toLocaleString(numberLocale),
+});
+
+const starPath =
+  "M10 1.45 12.24 6.4l5.4.47-4.1 3.52 1.26 5.28L10 13.14 5.2 15.67l1.26-5.28-4.1-3.52 5.4-.47L10 1.45z";
+const starIndexes = [0, 1, 2, 3, 4];
+
+function ratingLabel(rating: number): string {
+  const formatted = rating.toLocaleString(numberLocale, {
+    minimumFractionDigits: Number.isInteger(rating) ? 0 : 1,
+    maximumFractionDigits: 1,
+  });
+  return interpolate(t.reviewsStars, { rating: formatted });
+}
+
+function filledCount(rating: number): number {
+  return Math.max(0, Math.min(5, Math.round(rating)));
+}
+
+function paragraphs(text: string): string[] {
+  return text
+    .split(/\n{2,}/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+}
+
+function formatPublished(iso: string): string {
+  return new Intl.DateTimeFormat(numberLocale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${iso}T00:00:00`));
+}
 ---
 
-<section class="reviews" aria-labelledby="reseñas-titulo">
+<section class="reviews" data-reviews aria-labelledby="reseñas-titulo">
   <div class="container reviews__inner">
-    <div class="reviews__head">
-      <p class="tag tag--brand">{t.reviewsTag}</p>
-      <h2 id="reseñas-titulo">{t.reviewsTitleBefore}<br />{t.reviewsTitleAfter}</h2>
+    <header class="reviews__head">
+      <div class="reviews__heading">
+        <p class="tag tag--brand">{t.reviewsTag}</p>
+        <h2 id="reseñas-titulo">{t.reviewsTitleBefore}<br />{t.reviewsTitleAfter}</h2>
+      </div>
+
+      <div class="reviews__bar">
+        <p class="reviews__summary">
+          <span class="reviews__summary-stars" aria-hidden="true">
+            {
+              starIndexes.map((index) => (
+                <svg class="reviews__star is-on" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <path d={starPath} />
+                </svg>
+              ))
+            }
+          </span>
+          {" "}
+          <strong class="reviews__summary-score">{averageLabel}/5</strong>
+          {" "}
+          <strong class="reviews__summary-where">{t.reviewsOnGoogle}</strong>
+          {" "}
+          <span class="reviews__summary-meta">
+            <span class="reviews__summary-sep" aria-hidden="true">·</span>
+            <span class="reviews__summary-count">{totalLabel}</span>
+          </span>
+        </p>
+
+        <div class="reviews__controls">
+          <button type="button" class="reviews__nav" data-reviews-prev hidden disabled>
+            <span class="visually-hidden">{t.reviewsPrev}</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M12.5 4.5 7 10l5.5 5.5" />
+            </svg>
+          </button>
+          <button type="button" class="reviews__nav" data-reviews-next hidden disabled>
+            <span class="visually-hidden">{t.reviewsNext}</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M7.5 4.5 13 10l-5.5 5.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div
+      class="reviews__scroller"
+      id="reviews-scroller"
+      data-reviews-scroller
+      tabindex="0"
+      role="region"
+      aria-label={t.reviewsScroller}
+    >
+      <ul class="reviews__track">
+        {
+          reviews.map((review) => {
+            const authorId = `review-${review.id}`;
+            const quoteId = `review-text-${review.id}`;
+            const filled = filledCount(review.rating);
+
+            return (
+              <li>
+                <article class="reviews__card" data-review-card aria-labelledby={authorId}>
+                  <header class="reviews__card-head">
+                    <p class="reviews__author" id={authorId}>
+                      {review.author}
+                    </p>
+                    <p class="reviews__rating">
+                      <span class="reviews__stars" aria-hidden="true">
+                        {starIndexes.map((index) => (
+                          <svg
+                            class:list={["reviews__star", { "is-on": index < filled }]}
+                            viewBox="0 0 20 20"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path d={starPath} />
+                          </svg>
+                        ))}
+                      </span>
+                      <span class="visually-hidden">{ratingLabel(review.rating)}</span>
+                      {review.publishedAt ? (
+                        <time class="reviews__date" datetime={review.publishedAt}>
+                          {formatPublished(review.publishedAt)}
+                        </time>
+                      ) : null}
+                    </p>
+                  </header>
+
+                  <div class="reviews__clamp" data-review-quote>
+                    <blockquote class="reviews__quote" id={quoteId} lang={review.language}>
+                      <div class="reviews__text">
+                        {paragraphs(review.text).map((paragraph) => (
+                          <p>{paragraph}</p>
+                        ))}
+                      </div>
+                    </blockquote>
+                  </div>
+
+                  <footer class="reviews__card-foot">
+                    <button
+                      type="button"
+                      class="reviews__more"
+                      data-review-more
+                      hidden
+                      aria-expanded="false"
+                      aria-controls={quoteId}
+                      data-label-more={t.reviewsReadMore}
+                      data-label-less={t.reviewsReadLess}
+                    >
+                      {t.reviewsReadMore}
+                    </button>
+                    {
+                      review.url ? (
+                        <a
+                          class="reviews__source"
+                          href={review.url}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          aria-label={`${t.reviewsSource}. ${interpolate(t.reviewsOpenReview, { author: review.author })}. ${t.reviewsNewTab}`}
+                        >
+                          <span aria-hidden="true">{t.reviewsSource}</span>
+                        </a>
+                      ) : (
+                        <p class="reviews__source">{t.reviewsSource}</p>
+                      )
+                    }
+                  </footer>
+                </article>
+              </li>
+            );
+          })
+        }
+      </ul>
     </div>
 
-    <blockquote class="reviews__quote" data-reveal>
-      <p class="reviews__mark" aria-hidden="true">“</p>
-      <p class="reviews__text">
-        {t.reviewsQuote}
-      </p>
-      <footer class="reviews__source">Glops i Llandes</footer>
-    </blockquote>
-
-    <div class="reviews__pending">
-      <p class="stamp stamp--black reviews__stamp">{t.reviewsStamp}</p>
-      <p class="reviews__note">
-        {t.reviewsNote}
-      </p>
-      <a class="btn btn--ghost" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
-        {t.reviewsMaps}
-      </a>
-    </div>
+    <a class="btn btn--ghost reviews__cta" href={site.googleMapsUrl} rel="noopener noreferrer" target="_blank">
+      {t.reviewsMaps}
+      <span class="visually-hidden"> {t.reviewsNewTab}</span>
+    </a>
   </div>
 </section>
 
@@ -42,86 +201,497 @@ const t = ui(locale);
   .reviews {
     padding-block: var(--space-2xl);
     background: var(--color-paper);
+    /* Recorta el ancho máximo de la fila para que no ensanche el viewport. */
+    overflow-x: clip;
   }
 
   .reviews__inner {
     display: grid;
     gap: var(--space-l);
+    min-width: 0;
+    overflow-x: clip;
   }
 
-  .reviews__head > .tag {
-    margin-bottom: var(--space-xs);
+  .reviews__head,
+  .reviews__heading,
+  .reviews__bar {
+    display: grid;
+    min-width: 0;
   }
 
-  .reviews__quote {
+  .reviews__head {
+    gap: var(--space-s);
+  }
+
+  .reviews__heading {
+    justify-items: start;
+    gap: var(--space-xs);
+  }
+
+  .reviews__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+  }
+
+  .reviews__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.55rem;
+    min-width: 0;
+    max-width: 100%;
     margin: 0;
-    padding: var(--space-m);
-    border: var(--frame-width) solid var(--color-black);
-    border-radius: var(--radius-m);
-    background: var(--color-black);
-    color: var(--color-paper);
+    font-size: var(--text-m);
+    line-height: 1.35;
   }
 
-  .reviews__mark {
-    font-family: var(--font-display);
-    font-size: 3.5rem;
-    line-height: 0.6;
+  .reviews__summary-stars,
+  .reviews__stars {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.12rem;
     color: var(--color-brand);
   }
 
-  .reviews__text {
-    margin-top: var(--space-s);
+  .reviews__summary-stars .reviews__star {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .reviews__summary-score,
+  .reviews__summary-where {
+    font-weight: 600;
+  }
+
+  .reviews__summary-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.55rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .reviews__summary-sep,
+  .reviews__summary-count,
+  .reviews__date {
+    color: #4a4a46;
+    font-weight: 400;
+  }
+
+  .reviews__summary-count,
+  .reviews__date {
+    font-size: var(--text-s);
+  }
+
+  .reviews__controls {
+    display: flex;
+    gap: 0.375rem;
+    margin-left: auto;
+  }
+
+  .reviews__controls:not(:has(button:not([hidden]))) {
+    display: none;
+  }
+
+  .reviews__nav,
+  .reviews__more {
+    cursor: pointer;
+  }
+
+  .reviews__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid var(--color-black);
+    border-radius: var(--radius-m);
+    background: var(--color-white);
+    color: var(--color-black);
+  }
+
+  .reviews__nav[hidden],
+  .reviews__more[hidden] {
+    display: none;
+  }
+
+  .reviews__nav svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .reviews__nav svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .reviews__nav:hover:not(:disabled) {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+  }
+
+  .reviews__nav:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+
+  /*
+   * El carril es el único que hace scroll. min-width: 0 evita que la fila
+   * de tarjetas ensanche la página; el desbordamiento se queda aquí.
+   */
+  .reviews__scroller {
+    min-width: 0;
+    padding-bottom: 0.85rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a46 transparent;
+    /* paint evita que el ancho de la fila ensanche el viewport. */
+    contain: inline-size paint;
+    container-type: inline-size;
+  }
+
+  .reviews__scroller::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .reviews__scroller::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .reviews__scroller::-webkit-scrollbar-thumb {
+    background: #4a4a46;
+    border-radius: var(--radius-pill);
+  }
+
+  .reviews__scroller::-webkit-scrollbar-thumb:hover {
+    background: var(--color-black);
+  }
+
+  .reviews__track {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+    width: max-content;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reviews__track > li {
+    display: flex;
+    flex: 0 0 auto;
+    width: min(26rem, calc(100cqi - 3rem));
+    scroll-snap-align: start;
+  }
+
+  .reviews__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-s);
+    width: 100%;
+    min-width: 0;
+    padding: var(--space-m);
+    border: var(--frame-width) solid var(--color-black);
+    border-radius: var(--radius-m);
+    background: var(--color-white);
+  }
+
+  .reviews__card-head {
+    display: grid;
+    gap: var(--space-xs);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .reviews__author {
+    margin: 0;
     font-family: var(--font-display);
-    font-size: var(--title-s);
-    font-weight: 500;
-    line-height: 1.1;
+    font-size: var(--text-l);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+
+  .reviews__rating {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.7rem;
+    margin: 0;
+  }
+
+  .reviews__star {
+    display: block;
+    width: 0.95rem;
+    height: 0.95rem;
+    color: #cfcabe;
+  }
+
+  .reviews__star.is-on {
+    color: var(--color-brand);
+  }
+
+  .reviews__star path {
+    fill: currentColor;
+    stroke: var(--color-black);
+    stroke-width: 0.7;
+    stroke-linejoin: round;
+  }
+
+  .reviews__clamp {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    font-size: var(--text-s);
+    line-height: 1.6;
+  }
+
+  .reviews__clamp.is-clamped {
+    max-height: calc(3 * 1.6em);
+    overflow: hidden;
+  }
+
+  .reviews__clamp.is-clamped::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1.8em;
+    background: linear-gradient(to bottom, transparent, var(--color-white) 78%);
+    pointer-events: none;
+  }
+
+  .reviews__quote,
+  .reviews__text,
+  .reviews__text p,
+  .reviews__source {
+    margin: 0;
+  }
+
+  .reviews__text {
+    display: grid;
+    gap: 0.8em;
+  }
+
+  .reviews__text p {
+    overflow-wrap: break-word;
+  }
+
+  .reviews__more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-block: -0.55rem;
+    margin-inline: -0.55rem 0.35rem;
+    padding: 0.4rem 0.55rem;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: none;
+    color: var(--color-black);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 0.28em;
+  }
+
+  .reviews__more:hover {
+    background: var(--color-brand);
+    color: var(--color-black);
+  }
+
+  .reviews__card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.35rem;
+    width: 100%;
+    margin-top: auto;
   }
 
   .reviews__source {
-    margin-top: var(--space-m);
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-block: -0.55rem;
+    padding-inline: 0.15rem;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-brand);
+    color: #4a4a46;
   }
 
-  .reviews__pending {
-    display: grid;
-    justify-items: start;
-    gap: var(--space-s);
+  a.reviews__source {
+    text-decoration: underline;
+    text-underline-offset: 0.28em;
   }
 
-  .reviews__stamp {
-    width: 6rem;
+  a.reviews__source:hover {
+    color: var(--color-black);
   }
 
-  .reviews__note {
-    max-width: 42ch;
-    font-family: var(--font-mono);
-    font-size: var(--text-s);
-    line-height: 1.7;
+  .reviews__cta {
+    justify-self: start;
+    max-width: 100%;
+    height: auto;
+    text-align: center;
+    white-space: normal;
   }
 
-  @media (min-width: 62rem) {
-    .reviews__inner {
-      grid-template-columns: 0.9fr 1.1fr;
-      align-items: start;
-      column-gap: var(--space-xl);
-    }
-
-    .reviews__head {
-      grid-column: 1;
-    }
-
-    .reviews__quote {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
-
-    .reviews__pending {
-      grid-column: 1;
+  @media (prefers-reduced-motion: reduce) {
+    .reviews__scroller {
+      scroll-snap-type: none;
     }
   }
 </style>
+
+<script>
+  const sections = document.querySelectorAll<HTMLElement>("[data-reviews]");
+
+  for (const root of sections) {
+    if (root.dataset.reviewsReady === "true") continue;
+    root.dataset.reviewsReady = "true";
+
+    const scroller = root.querySelector<HTMLElement>("[data-reviews-scroller]");
+    const prev = root.querySelector<HTMLButtonElement>("[data-reviews-prev]");
+    const next = root.querySelector<HTMLButtonElement>("[data-reviews-next]");
+    if (!scroller || !prev || !next) continue;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const updateNav = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const hasOverflow = max > 2;
+      prev.hidden = !hasOverflow;
+      next.hidden = !hasOverflow;
+      scroller.tabIndex = hasOverflow ? 0 : -1;
+      prev.disabled = !hasOverflow || scroller.scrollLeft <= 2;
+      next.disabled = !hasOverflow || scroller.scrollLeft >= max - 2;
+    };
+
+    const syncCard = (card: HTMLElement) => {
+      const quote = card.querySelector<HTMLElement>("[data-review-quote]");
+      const more = card.querySelector<HTMLButtonElement>("[data-review-more]");
+      if (!quote || !more || more.getAttribute("aria-expanded") === "true") return;
+
+      quote.classList.add("is-clamped");
+      const overflows = quote.scrollHeight > quote.clientHeight + 1;
+      if (!overflows) quote.classList.remove("is-clamped");
+      more.hidden = !overflows;
+    };
+
+    const syncCards = () => {
+      root.querySelectorAll<HTMLElement>("[data-review-card]").forEach(syncCard);
+    };
+
+    const syncHeights = () => {
+      const cards = [...root.querySelectorAll<HTMLElement>("[data-review-card]")];
+      for (const card of cards) card.style.minHeight = "";
+
+      let max = 0;
+      const restore: HTMLElement[] = [];
+      for (const card of cards) {
+        const quote = card.querySelector<HTMLElement>("[data-review-quote]");
+        const more = card.querySelector<HTMLButtonElement>("[data-review-more]");
+        const expanded = more?.getAttribute("aria-expanded") === "true";
+        if (expanded && quote) {
+          quote.classList.add("is-clamped");
+          restore.push(quote);
+        }
+        max = Math.max(max, card.offsetHeight);
+      }
+      for (const quote of restore) quote.classList.remove("is-clamped");
+
+      const value = max > 0 ? `${Math.round(max)}px` : "";
+      for (const card of cards) card.style.minHeight = value;
+    };
+
+    const cardStep = () => {
+      const item = scroller.querySelector<HTMLElement>(".reviews__track > li");
+      if (!item) return Math.max(scroller.clientWidth * 0.8, 1);
+      const track = scroller.querySelector<HTMLElement>(".reviews__track");
+      const gap = Number.parseFloat(getComputedStyle(track ?? scroller).columnGap || "0");
+      return item.getBoundingClientRect().width + (Number.isFinite(gap) ? gap : 0);
+    };
+
+    const move = (direction: 1 | -1) => {
+      scroller.scrollBy({
+        left: direction * cardStep(),
+        behavior: reducedMotion.matches ? "auto" : "smooth",
+      });
+    };
+
+    prev.addEventListener("click", () => move(-1));
+    next.addEventListener("click", () => move(1));
+
+    root.querySelectorAll<HTMLElement>("[data-review-card]").forEach((card) => {
+      const quote = card.querySelector<HTMLElement>("[data-review-quote]");
+      const more = card.querySelector<HTMLButtonElement>("[data-review-more]");
+      if (!quote || !more) return;
+
+      const labelMore = more.dataset.labelMore ?? more.textContent ?? "";
+      const labelLess = more.dataset.labelLess ?? labelMore;
+
+      more.addEventListener("click", () => {
+        const expanded = more.getAttribute("aria-expanded") === "true";
+        const nextExpanded = !expanded;
+        more.setAttribute("aria-expanded", String(nextExpanded));
+        more.textContent = nextExpanded ? labelLess : labelMore;
+        if (nextExpanded) {
+          quote.classList.remove("is-clamped");
+          more.hidden = false;
+          syncHeights();
+          return;
+        }
+        syncCard(card);
+        syncHeights();
+        more.scrollIntoView({
+          block: "nearest",
+          inline: "nearest",
+          behavior: reducedMotion.matches ? "auto" : "smooth",
+        });
+      });
+    });
+
+    scroller.addEventListener("scroll", updateNav, { passive: true });
+
+    const observer = new ResizeObserver(() => {
+      updateNav();
+      syncCards();
+      syncHeights();
+    });
+    observer.observe(scroller);
+    const track = scroller.querySelector<HTMLElement>(".reviews__track");
+    if (track) observer.observe(track);
+
+    updateNav();
+    syncCards();
+    syncHeights();
+
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        updateNav();
+        syncCards();
+        syncHeights();
+      });
+    }
+  }
+</script>

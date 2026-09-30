@@ -72,7 +72,6 @@ export function getNavItems(locale: Locale, labels: NavLabels) {
     { label: labels.carta, href: pageHref(locale, 'carta') },
     { label: labels.house, href: homeSectionHref(locale, 'manifesto') },
     { label: labels.gallery, href: homeSectionHref(locale, 'galeria') },
-    { label: labels.location, href: homeSectionHref(locale, 'ubicacion') },
   ] as const;
 }
 
@@ -80,5 +79,4 @@ export interface NavLabels {
   readonly carta: string;
   readonly house: string;
   readonly gallery: string;
-  readonly location: string;
 }

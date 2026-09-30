@@ -17,7 +17,7 @@ const EXTERNAL = /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i;
 /**
  * Antepone el base a una ruta que empieza por `/`.
  * `withBase("/carta")` → `/carta` o `/glops-i-llandes/carta`.
- * `withBase("/#ubicacion")` → `/#ubicacion` o `/glops-i-llandes/#ubicacion`.
+ * `withBase("/#galeria")` → `/#galeria` o `/glops-i-llandes/#galeria`.
  * URLs absolutas, `tel:`, `mailto:` y fragmentos sueltos se devuelven intactos.
  */
 export function withBase(path: string): string {

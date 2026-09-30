@@ -2,7 +2,6 @@
 import MenuExplorer from "../menu/MenuExplorer";
 import { site } from "../../config/site";
 import type { Locale } from "../../i18n/locale";
-import { homeSectionHref } from "../../i18n/routes";
 import { ui } from "../../i18n/ui";
 import Layout from "../../layouts/Layout.astro";
 
@@ -57,7 +56,12 @@ const tickerRepeats = 8;
         <h2 id="carta-cta-titulo">{t.cartaCtaTitleBefore}<br />{t.cartaCtaTitleAfter}</h2>
         <div class="carta-cta__actions">
           <a class="btn btn--brand" href={site.phone.href}>{t.call} {site.phone.display}</a>
-          <a class="btn carta-cta__ghost" href={homeSectionHref(locale, "ubicacion")}>{t.locationDirections}</a>
+          <a
+            class="btn carta-cta__ghost"
+            href={site.address.mapsSearchUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+          >{t.locationDirections}</a>
         </div>
       </div>
     </section>

@@ -62,4 +62,6 @@ export const site = {
   address,
   phone,
   reservations,
+  /** Enlace del local en Google Maps. Lo usa el CTA de reseñas, no cada opinión. */
+  googleMapsUrl: 'https://maps.app.goo.gl/PTMPhdBfq7wQG5Zj9',
 } as const;
