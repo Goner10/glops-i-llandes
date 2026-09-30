@@ -1,25 +1,35 @@
 ---
 import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { pageHref } from "../../i18n/routes";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
 ---
 
 <section class="reservations" id="reservas" aria-labelledby="reservas-titulo">
   <div class="container reservations__inner">
     <div class="reservations__head">
-      <p class="eyebrow reservations__eyebrow">Reservas</p>
-      <h2 id="reservas-titulo">Guárdanos<br />la mesa</h2>
+      <p class="eyebrow reservations__eyebrow">{t.homeReservasEyebrow}</p>
+      <h2 id="reservas-titulo">{t.homeReservasTitleBefore}<br />{t.homeReservasTitleAfter}</h2>
       <p class="reservations__text">
-        Para grupos y para las horas punta, mejor avisar antes.
+        {t.homeReservasText}
       </p>
     </div>
 
     <div class="reservations__actions">
       <a class="btn btn--brand reservations__phone" href={site.phone.href}>
-        Llamar {site.phone.display}
+        {t.call} {site.phone.display}
       </a>
 
-      <a class="btn reservations__online" href={site.reservations.url}>Reservar online</a>
+      <a class="btn reservations__online" href={pageHref(locale, "reservas")}>{t.homeReservasOnline}</a>
 
-      <p class="reservations__note">{site.reservations.note}</p>
+      <p class="reservations__note">{t.reservasNote}</p>
     </div>
   </div>
 

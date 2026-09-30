@@ -1,27 +1,5 @@
 ---
-import Events from "../components/home/Events.astro";
-import FeaturedMenu from "../components/home/FeaturedMenu.astro";
-import Gallery from "../components/home/Gallery.astro";
-import Hero from "../components/home/Hero.astro";
-import Location from "../components/home/Location.astro";
-import Manifesto from "../components/home/Manifesto.astro";
-import Reservations from "../components/home/Reservations.astro";
-import ReviewsPreview from "../components/home/ReviewsPreview.astro";
-import ScrollStory from "../components/home/ScrollStory.astro";
-import { site } from "../config/site";
-import Layout from "../layouts/Layout.astro";
+import HomePage from "../components/pages/HomePage.astro";
 ---
 
-<Layout title={`${site.name} · Bar de tapas y cócteles en el Cabanyal`} compactHeader>
-  <main id="contenido">
-    <Hero />
-    <Manifesto />
-    <ScrollStory />
-    <Gallery />
-    <FeaturedMenu />
-    <Events />
-    <ReviewsPreview />
-    <Reservations />
-    <Location />
-  </main>
-</Layout>
+<HomePage locale="es" />

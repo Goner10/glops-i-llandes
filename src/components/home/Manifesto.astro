@@ -2,22 +2,29 @@
 import { Image } from "astro:assets";
 
 import rotulo from "../../assets/images/gallery/rotulo - copia.jpg";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
 ---
 
 <section class="manifesto" id="manifesto" aria-labelledby="manifesto-titulo">
   <div class="container manifesto__inner">
     <div class="manifesto__text" data-reveal>
-      <p class="tag tag--brand">La casa</p>
+      <p class="tag tag--brand">{t.manifestoTag}</p>
       <h2 class="manifesto__title" id="manifesto-titulo">
-        En el corazón del Cabanyal<span class="manifesto__dots">...</span>
+        {t.manifestoTitle}<span class="manifesto__dots">...</span>
       </h2>
       <p class="manifesto__lead">
-        Entre fachadas modernistas y redes de pesca, nace Glops i Llandes. Aquí no venimos a
-        reinventar nada, sino a celebrar lo que ya funcionaba: mesas compartidas, brindis
-        espontáneos y sabores que despiertan recuerdos.
+        {t.manifestoLead}
       </p>
       <p class="manifesto__closing">
-        Porque aquí no solo nos importa lo que servimos, sino la vibra que creamos.
+        {t.manifestoClosing}
       </p>
     </div>
 
@@ -25,7 +32,7 @@ import rotulo from "../../assets/images/gallery/rotulo - copia.jpg";
       <div class="frame manifesto__frame">
         <Image
           src={rotulo}
-          alt="Rótulo luminoso de Glops i Llandes en la fachada del local, de noche"
+          alt={t.manifestoImageAlt}
           widths={[320, rotulo.width]}
           sizes="(min-width: 62rem) 22rem, (min-width: 40rem) 45vw, 78vw"
           loading="lazy"

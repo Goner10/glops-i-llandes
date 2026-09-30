@@ -1,33 +1,38 @@
 ---
 import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
 
-// Bloque provisional: no se publican reseñas, autores ni puntuaciones hasta que
-// haya opiniones reales conectadas.
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
 ---
 
 <section class="reviews" aria-labelledby="reseñas-titulo">
   <div class="container reviews__inner">
     <div class="reviews__head">
-      <p class="tag tag--brand">Reseñas</p>
-      <h2 id="reseñas-titulo">Lo que se dice<br />en las redes</h2>
+      <p class="tag tag--brand">{t.reviewsTag}</p>
+      <h2 id="reseñas-titulo">{t.reviewsTitleBefore}<br />{t.reviewsTitleAfter}</h2>
     </div>
 
     <blockquote class="reviews__quote" data-reveal>
       <p class="reviews__mark" aria-hidden="true">“</p>
       <p class="reviews__text">
-        Aquí no solo nos importa lo que servimos, sino la vibra que creamos.
+        {t.reviewsQuote}
       </p>
       <footer class="reviews__source">Glops i Llandes</footer>
     </blockquote>
 
     <div class="reviews__pending">
-      <p class="stamp stamp--black reviews__stamp">Sin publicar</p>
+      <p class="stamp stamp--black reviews__stamp">{t.reviewsStamp}</p>
       <p class="reviews__note">
-        Todavía no mostramos opiniones en la web. Cuando conectemos las reseñas reales del local,
-        se verán aquí tal cual, sin selección ni retoques.
+        {t.reviewsNote}
       </p>
       <a class="btn btn--ghost" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
-        Ver el local en Google
+        {t.reviewsMaps}
       </a>
     </div>
   </div>

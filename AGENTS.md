@@ -8,6 +8,16 @@ Web de un bar de tapas de El Cabanyal. Astro + TypeScript; React solo para la is
 - Respeta los componentes, estilos y convenciones existentes.
 - Consulta la documentación oficial de Astro cuando cambies configuración, rutas, hidratación o una API cuyo comportamiento no esté claro.
 
+## Idiomas
+
+- Idiomas: español (`es`, predeterminado) e inglés (`en`).
+- La URL determina el idioma. No hay detección del navegador ni redirecciones por cookie o geolocalización.
+- Rutas: `/`, `/carta`, `/reservas` (español) y `/en`, `/en/carta`, `/en/reservas` (inglés).
+- Diccionarios de interfaz: `src/i18n/ui.ts`. Rutas localizadas: `src/i18n/routes.ts`.
+- Carta: datos compartidos en `src/data/menu.ts`; copy en inglés por ID en `src/i18n/products-en.ts`.
+- Vinos: datos en `src/data/wines.ts`; etiquetas de grupos y notas en `src/i18n/wines.ts`.
+- Para un texto de interfaz, añade la misma clave en `es` y `en` de `ui.ts`. Para un plato, traduce por su ID sin duplicar precio, imagen ni alérgenos.
+
 ## Carta y contenido
 
 - Los productos se definen en `src/data/menu.ts`.

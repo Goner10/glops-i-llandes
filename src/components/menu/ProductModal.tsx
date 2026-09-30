@@ -1,19 +1,22 @@
 import { useEffect, useRef } from "react";
 
-import { getCategoryLabel, type MenuProduct } from "../../data/menu";
+import type { Locale } from "../../i18n/locale";
+import { categoryLabel, type LocalizedProduct } from "../../i18n/products";
+import { interpolate, ui } from "../../i18n/ui";
 import { withBase } from "../../lib/paths";
 import AllergenList from "./AllergenList";
 import ProductPlaceholder from "./ProductPlaceholder";
 
 interface ProductModalProps {
-  product: MenuProduct | null;
+  locale: Locale;
+  product: LocalizedProduct | null;
   onClose: () => void;
 }
 
-export default function ProductModal({ product, onClose }: ProductModalProps) {
+export default function ProductModal({ locale, product, onClose }: ProductModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const t = ui(locale);
 
-  // `showModal` aporta la trampa de foco y el cierre con Escape del navegador.
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -25,7 +28,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
     }
   }, [product]);
 
-  // El scroll del body se bloquea mientras el modal está abierto.
   useEffect(() => {
     if (product === null) return;
 
@@ -40,7 +42,6 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   if (product === null) return null;
 
   const titleId = `producto-${product.id}`;
-  // Sin redacción confirmada no se pinta nada: ni párrafo vacío ni aviso.
   const description = product.description?.trim();
 
   return (
@@ -55,24 +56,18 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
       }}
       onClose={onClose}
       onClick={(event) => {
-        // Clic en el backdrop: el objetivo es el propio <dialog>, no su contenido.
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div className="product-modal__panel">
-        <button
-          type="button"
-          className="product-modal__close"
-          onClick={onClose}
-          autoFocus
-        >
+        <button type="button" className="product-modal__close" onClick={onClose} autoFocus>
           <span aria-hidden="true">✕</span>
-          <span className="visually-hidden">Cerrar ficha de {product.name}</span>
+          <span className="visually-hidden">{interpolate(t.closeProduct, { name: product.name })}</span>
         </button>
 
         <div className="product-modal__media">
           {product.image === null ? (
-            <ProductPlaceholder name={product.name} ratio="1 / 1" size="modal" />
+            <ProductPlaceholder locale={locale} name={product.name} ratio="1 / 1" size="modal" />
           ) : (
             <img
               className="product-modal__image"
@@ -85,7 +80,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         </div>
 
         <div className="product-modal__body">
-          <p className="tag tag--brand">{getCategoryLabel(product.category)}</p>
+          <p className="tag tag--brand">{categoryLabel(product.category, locale)}</p>
           <h2 className="product-modal__title" id={titleId}>
             {product.name}
           </h2>
@@ -93,8 +88,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
           {description && <p className="product-modal__description">{description}</p>}
 
-          {/* Después de la descripción, y solo si el local los ha confirmado. */}
-          <AllergenList allergens={product.allergens} variant="modal" />
+          <AllergenList locale={locale} allergens={product.allergens} variant="modal" />
 
           <div className="product-modal__cut" aria-hidden="true" />
         </div>

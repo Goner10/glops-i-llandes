@@ -1,5 +1,3 @@
-import { withBase } from '../lib/paths';
-
 export interface SiteAddress {
   readonly street: string;
   readonly postalCode: string;
@@ -26,15 +24,7 @@ export interface SiteReservationsWidget {
 }
 
 export interface SiteReservations {
-  /** Ruta interna de la página con el widget de reservas. */
-  readonly url: string;
-  readonly note: string;
   readonly widget: SiteReservationsWidget;
-}
-
-export interface SiteNavItem {
-  readonly label: string;
-  readonly href: string;
 }
 
 const name = 'Glops i Llandes';
@@ -60,8 +50,6 @@ const phone: SitePhone = {
 };
 
 const reservations: SiteReservations = {
-  url: withBase('/reservas'),
-  note: 'Reserva online o por teléfono. Para grupos grandes, mejor llámanos.',
   widget: {
     eid: 'hydra-882011d3-6ed0-4816-b696-e98e1b6cf02d',
     containerId: 'hors-hydra-882011d3-6ed0-4816-b696-e98e1b6cf02d',
@@ -69,21 +57,9 @@ const reservations: SiteReservations = {
   },
 };
 
-// Rutas internas ya resueltas con el base del despliegue.
-const nav: readonly SiteNavItem[] = [
-  { label: 'Carta', href: withBase('/carta') },
-  { label: 'La casa', href: withBase('/#manifesto') },
-  { label: 'Galería', href: withBase('/#galeria') },
-  { label: 'Dónde estamos', href: withBase('/#ubicacion') },
-];
-
 export const site = {
   name,
-  claim: 'COMIDA · ARTE · COCKTAILS · AMIGOS',
-  description:
-    'Bar de tapas, conservas y cócteles en el Cabanyal, València. Comida, arte, cócteles y amigos.',
   address,
   phone,
   reservations,
-  nav,
 } as const;

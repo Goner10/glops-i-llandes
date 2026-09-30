@@ -1,0 +1,162 @@
+---
+import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
+import Layout from "../../layouts/Layout.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
+const { widget } = site.reservations;
+---
+
+<Layout
+  locale={locale}
+  page="reservas"
+  title={t.seoReservasTitle}
+  description={t.seoReservasDescription}
+  strip="rule"
+>
+  <main id="contenido">
+    <section class="reservas-head" aria-labelledby="reservas-titulo">
+      <div class="container reservas-head__inner">
+        <p class="eyebrow reservas-head__eyebrow">{t.reservasEyebrow}</p>
+        <h1 id="reservas-titulo">{t.reservasTitleBefore}<br />{t.reservasTitleAfter}</h1>
+        <p class="reservas-head__text">
+          {t.reservasLead}
+        </p>
+      </div>
+    </section>
+
+    <section class="reservas-widget" aria-label={t.reservasWidget}>
+      <div class="container">
+        <div class="reservas-widget__box" id={widget.containerId}></div>
+
+        <p class="reservas-widget__error" data-reservas-error hidden>
+          {t.reservasError}
+        </p>
+
+        <script
+          is:inline
+          define:vars={{ eid: widget.eid, tagid: widget.containerId, src: widget.scriptSrc }}
+        >
+          (function () {
+            if (document.querySelector('script[src="' + src + '"]')) return;
+
+            window._hors = [
+              ["eid", eid],
+              ["tagid", tagid],
+              ["width", "100%"],
+              ["height", ""],
+            ];
+
+            var script = document.createElement("script");
+            script.src = src;
+            script.async = true;
+            script.onerror = function () {
+              var error = document.querySelector("[data-reservas-error]");
+              if (error) error.hidden = false;
+            };
+            document.body.appendChild(script);
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="reservas-phone" aria-labelledby="reservas-telefono-titulo">
+      <div class="container reservas-phone__inner">
+        <div>
+          <h2 id="reservas-telefono-titulo">{t.reservasPhoneTitleBefore}<br />{t.reservasPhoneTitleAfter}</h2>
+          <p class="reservas-phone__note">{t.reservasNote}</p>
+        </div>
+        <a class="btn btn--brand reservas-phone__btn" href={site.phone.href}>
+          {t.call} {site.phone.display}
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .reservas-head {
+    background: var(--color-black);
+    color: var(--color-paper);
+  }
+
+  .reservas-head__inner {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-m);
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+
+  .reservas-head__eyebrow {
+    color: var(--color-brand);
+  }
+
+  .reservas-head__text {
+    max-width: 40ch;
+    color: #d8d5cd;
+  }
+
+  .reservas-widget {
+    padding-block: var(--space-xl);
+    background: var(--color-paper);
+    overflow-x: clip;
+  }
+
+  .reservas-widget__box {
+    width: 100%;
+    max-width: 52rem;
+    min-height: 28rem;
+    margin-inline: auto;
+  }
+
+  .reservas-widget__box :global(iframe) {
+    display: block;
+    max-width: 100%;
+  }
+
+  .reservas-widget__error {
+    max-width: 44ch;
+    margin: var(--space-m) auto 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+    text-align: center;
+  }
+
+  .reservas-phone {
+    padding-block: var(--space-2xl);
+    background: var(--color-paper);
+    border-top: var(--frame-width) solid var(--color-black);
+  }
+
+  .reservas-phone__inner {
+    display: grid;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .reservas-phone__note {
+    max-width: 40ch;
+    margin-top: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: var(--text-s);
+    line-height: 1.7;
+  }
+
+  .reservas-phone__btn {
+    justify-self: start;
+    font-size: var(--text-l);
+  }
+
+  @media (min-width: 62rem) {
+    .reservas-phone__inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

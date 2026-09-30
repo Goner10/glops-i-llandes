@@ -1,21 +1,32 @@
 ---
+import { Image } from "astro:assets";
+
+import wordmark from "../../assets/images/brand/texto-blanco.png";
 import heroImage from "../../assets/images/home/barraGlops.jpeg";
-import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { pageHref } from "../../i18n/routes";
+import { ui } from "../../i18n/ui";
 import { withBase } from "../../lib/paths";
 import HeroMedia from "./HeroMedia.astro";
 
-// Vídeos decorativos de `public/videos`: vertical por debajo de 62rem, horizontal a partir de ahí.
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
+
 const heroVideoMobile = withBase("/videos/hero-mobile.mp4");
 const heroVideoDesktop = withBase("/videos/hero-desktop.mp4");
 
-const claimParts = site.claim.split(" · ");
+const claimParts = t.claim.split(" · ");
 ---
 
 <section class="hero" aria-labelledby="hero-titulo" data-hero>
   <!-- Fondo: vídeo (o imagen de respaldo) a todo el ancho, con la altura que fija `.hero`. -->
   <HeroMedia
     poster={heroImage}
-    alt="Barra de Glops i Llandes con taburetes verdes y las botellas de la estantería al fondo"
+    alt={t.heroPosterAlt}
     videoMobile={heroVideoMobile}
     videoDesktop={heroVideoDesktop}
     fill
@@ -29,12 +40,18 @@ const claimParts = site.claim.split(" · ");
   <div class="container hero__inner">
     <div class="hero__text">
       <p class="eyebrow hero__where">
-        {site.address.neighbourhood} · {site.address.city}
+        {t.heroWhere}
       </p>
 
       <h1 class="hero__title" id="hero-titulo">
-        <span class="hero__line">Glops <span class="hero__i">i</span></span>
-        <span class="hero__line">Llandes</span>
+        <Image
+          class="hero__wordmark"
+          src={wordmark}
+          alt="Glops i Llandes"
+          widths={[640, 960, 1280, 1768]}
+          sizes="(min-width: 62rem) min(44rem, 70vw), calc(100vw - 2rem)"
+          loading="eager"
+        />
       </h1>
 
       <p class="hero__claim">
@@ -49,8 +66,8 @@ const claimParts = site.claim.split(" · ");
       </p>
 
       <div class="hero__actions">
-        <a class="btn btn--brand" href={withBase("/carta")}>Ver la carta</a>
-        <a class="btn hero__btn-reserva" href={site.reservations.url}>Reservar</a>
+        <a class="btn btn--brand" href={pageHref(locale, "carta")}>{t.heroCarta}</a>
+        <a class="btn hero__btn-reserva" href={pageHref(locale, "reservas")}>{t.heroReserve}</a>
       </div>
     </div>
   </div>
@@ -115,20 +132,15 @@ const claimParts = site.claim.split(" · ");
 
   .hero__title {
     margin-block: var(--space-s) var(--space-m);
-    color: var(--color-paper);
-    font-size: var(--title-l);
-    line-height: 0.86;
+    width: 100%;
+    max-width: 100%;
   }
 
-  .hero__line {
+  .hero__title :global(.hero__wordmark) {
     display: block;
-  }
-
-  .hero__i {
-    display: inline-block;
-    padding: 0 0.2em;
-    background: var(--color-brand);
-    color: var(--color-black);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4419 / 844;
   }
 
   .hero__claim {
@@ -186,15 +198,22 @@ const claimParts = site.claim.split(" · ");
     }
 
     .hero__text {
-      max-width: 40rem;
-    }
-
-    .hero__title {
-      font-size: clamp(3.4rem, 1.8rem + 4.2vw, 5.6rem);
+      max-width: 44rem;
     }
 
     .hero__actions {
       margin-top: var(--space-l);
+    }
+  }
+
+  @media (max-height: 28rem) and (orientation: landscape) {
+    .hero__title {
+      margin-block: var(--space-xs) var(--space-s);
+      max-width: 28rem;
+    }
+
+    .hero__actions {
+      margin-top: var(--space-s);
     }
   }
 </style>

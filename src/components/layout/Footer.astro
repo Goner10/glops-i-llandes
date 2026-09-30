@@ -3,19 +3,29 @@ import { Image } from "astro:assets";
 
 import logoWhite from "../../assets/images/brand/TODO_2.png";
 import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { getNavItems } from "../../i18n/routes";
+import { ui } from "../../i18n/ui";
 
 interface Props {
+  locale: Locale;
   /** Remate superior: damero en la portada, doble filete en la carta. */
   strip?: "checker" | "rule";
 }
 
-const { strip = "checker" } = Astro.props;
+const { locale, strip = "checker" } = Astro.props;
+const t = ui(locale);
 const year = new Date().getFullYear();
+const nav = getNavItems(locale, {
+  carta: t.navCarta,
+  house: t.navHouse,
+  gallery: t.navGallery,
+  location: t.navLocation,
+});
+const claimParts = t.claim.split(" · ");
 ---
 
 <footer class="site-footer">
-  
-
   <div class="container inner">
     <div class="mark">
       <Image
@@ -25,33 +35,33 @@ const year = new Date().getFullYear();
         sizes="(min-width: 48rem) 320px, 240px"
         loading="lazy"
       />
-      <p class="eyebrow claim">{site.claim}</p>
+      <p class="eyebrow claim">{claimParts.join(" · ")}</p>
     </div>
 
     <div class="cols">
       <section class="col">
-        <h2 class="col__title">Dónde</h2>
+        <h2 class="col__title">{t.footerWhere}</h2>
         <address>
           {site.address.street}<br />
           {site.address.postalCode} {site.address.city}<br />
           {site.address.neighbourhood}
         </address>
         <a class="link" href={site.address.mapsSearchUrl} rel="noopener noreferrer" target="_blank">
-          Abrir en Google Maps
+          {t.footerMaps}
         </a>
       </section>
 
       <section class="col">
-        <h2 class="col__title">Contacto</h2>
+        <h2 class="col__title">{t.footerContact}</h2>
         <a class="link link--big" href={site.phone.href}>{site.phone.display}</a>
-        <p class="note">{site.reservations.note}</p>
+        <p class="note">{t.reservasNote}</p>
       </section>
 
       <section class="col">
-        <h2 class="col__title">Ir a</h2>
+        <h2 class="col__title">{t.footerGo}</h2>
         <ul>
           {
-            site.nav.map((item) => (
+            nav.map((item) => (
               <li>
                 <a class="link" href={item.href}>
                   {item.label}
@@ -64,11 +74,9 @@ const year = new Date().getFullYear();
     </div>
 
     <p class="legal">
-      © {year} {site.name} · El Cabanyal, {site.address.city} ·
-      Desarrollado por <a href="https://goner10.github.io/Portfolio-2026/" target="_blank">Gonzalo A. Martí</a>
+      © {year} {site.name} · El Cabanyal, {site.address.city} · {t.footerLegal}{" "}
+      <a href="https://goner10.github.io/Portfolio-2026/" target="_blank">Gonzalo A. Martí</a>
     </p>
-
-   
   </div>
 </footer>
 

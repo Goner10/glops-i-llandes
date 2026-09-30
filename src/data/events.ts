@@ -21,7 +21,10 @@ export interface EditorialPillar {
   readonly text: string;
 }
 
-/** Pieza editorial genérica sobre lo que pasa en la casa, sin fechas ni nombres inventados. */
+/**
+ * Pieza editorial genérica sobre lo que pasa en la casa, sin fechas ni nombres inventados.
+ * Los textos visibles salen de `src/i18n/ui.ts`; esto documenta el contenido de origen.
+ */
 export const editorialPillars: readonly EditorialPillar[] = [
   {
     id: 'arte',

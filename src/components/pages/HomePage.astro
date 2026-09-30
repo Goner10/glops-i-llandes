@@ -1,0 +1,35 @@
+---
+import Events from "../home/Events.astro";
+import FeaturedMenu from "../home/FeaturedMenu.astro";
+import Gallery from "../home/Gallery.astro";
+import Hero from "../home/Hero.astro";
+import Location from "../home/Location.astro";
+import Manifesto from "../home/Manifesto.astro";
+import Reservations from "../home/Reservations.astro";
+import ReviewsPreview from "../home/ReviewsPreview.astro";
+import ScrollStory from "../home/ScrollStory.astro";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
+import Layout from "../../layouts/Layout.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
+---
+
+<Layout locale={locale} page="home" title={t.seoHomeTitle} description={t.seoHomeDescription} compactHeader>
+  <main id="contenido">
+    <Hero locale={locale} />
+    <Manifesto locale={locale} />
+    <ScrollStory locale={locale} />
+    <Gallery locale={locale} />
+    <FeaturedMenu locale={locale} />
+    <Events locale={locale} />
+    <ReviewsPreview locale={locale} />
+    <Reservations locale={locale} />
+    <Location locale={locale} />
+  </main>
+</Layout>

@@ -1,31 +1,46 @@
 ---
 import { Font } from "astro:assets";
 
-import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
-import { site } from "../config/site";
+import Header from "../components/layout/Header.astro";
+import { locales } from "../i18n/locale";
+import type { Locale } from "../i18n/locale";
+import {
+  absolutePageUrl,
+  localeHtmlLang,
+  localeOg,
+  type PageId,
+} from "../i18n/routes";
+import { ui } from "../i18n/ui";
 import { withBase } from "../lib/paths";
 import "../styles/global.css";
 
 interface Props {
+  locale: Locale;
+  page: PageId;
   title: string;
-  description?: string;
+  description: string;
   /** Remate del header y del footer. La carta prescinde del damero. */
   strip?: "checker" | "rule";
-  /** Header solo con el logo gráfico (home, donde el nombre ya va en el H1 del hero). */
+  /** Header superpuesto al hero en la portada; en interiores arranca sólido. */
   compactHeader?: boolean;
 }
 
 const {
+  locale,
+  page,
   title,
-  description = site.description,
+  description,
   strip = "checker",
   compactHeader = false,
 } = Astro.props;
+
+const t = ui(locale);
+const canonical = absolutePageUrl(locale, page);
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={localeHtmlLang(locale)}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,7 +50,24 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale" content={localeOg(locale)} />
+    {
+      locales
+        .filter((item) => item !== locale)
+        .map((item) => <meta property="og:locale:alternate" content={localeOg(item)} />)
+    }
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      locales.map((item) => {
+        const href = absolutePageUrl(item, page);
+        return href ? <link rel="alternate" hreflang={item} href={href} /> : null;
+      })
+    }
+    {
+      absolutePageUrl("es", page) && (
+        <link rel="alternate" hreflang="x-default" href={absolutePageUrl("es", page)} />
+      )
+    }
 
     <Font cssVariable="--font-oswald" preload />
     <Font cssVariable="--font-archivo" preload />
@@ -45,12 +77,12 @@ const {
   </head>
 
   <body>
-    <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <Header strip={strip} compact={compactHeader} />
+    <a class="skip-link" href="#contenido">{t.skipToContent}</a>
+    <Header locale={locale} page={page} strip={strip} compact={compactHeader} />
     <slot />
     <!--
-      Tras el slot: el hero ya está en el DOM. Evita un frame con el wordmark
-      blanco si la home carga ya scrolleada (ancla, historial).
+      Tras el slot: el hero ya está en el DOM. Evita un frame con el símbolo
+      blanco sobre papel si la home carga ya scrolleada (ancla, historial).
     -->
     <script is:inline>
       (function () {
@@ -63,7 +95,7 @@ const {
         if (window.scrollY > 16) header.classList.add("is-compacted");
       })();
     </script>
-    <Footer strip={strip} />
+    <Footer locale={locale} strip={strip} />
 
     <script>
       import { initReveal } from "../scripts/animations/reveal";

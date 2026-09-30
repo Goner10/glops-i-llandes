@@ -6,7 +6,15 @@ import berberechos from "../../assets/images/gallery/berberechos - copia.jpg";
 import champagne from "../../assets/images/gallery/champagne - copia.jpg";
 import quesos from "../../assets/images/gallery/quesos - copia.jpg";
 import risas from "../../assets/images/gallery/risas - copia.jpg";
-import { site } from "../../config/site";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
 
 interface PhotoBlock {
   kind: "photo";
@@ -30,8 +38,8 @@ const blocks: GalleryBlock[] = [
     kind: "photo",
     slot: "a",
     image: risas,
-    alt: "Tres personas del equipo compartiendo tapas y vino alrededor de una mesa de mármol",
-    tag: "Mesa compartida",
+    alt: t.galleryPhotoAAlt,
+    tag: t.galleryPhotoATag,
     ratio: "4 / 5",
     sizes: "(min-width: 62rem) 36rem, (min-width: 44rem) 48vw, 92vw",
   },
@@ -39,8 +47,8 @@ const blocks: GalleryBlock[] = [
     kind: "photo",
     slot: "b",
     image: champagne,
-    alt: "Botella sirviendo champán sobre una torre de copas apoyada en una silla amarilla",
-    tag: "Brindis",
+    alt: t.galleryPhotoBAlt,
+    tag: t.galleryPhotoBTag,
     ratio: "2 / 3",
     sizes: "(min-width: 62rem) 24rem, (min-width: 44rem) 48vw, 92vw",
   },
@@ -49,8 +57,8 @@ const blocks: GalleryBlock[] = [
     kind: "photo",
     slot: "d",
     image: quesos,
-    alt: "Tabla de quesos con nueces y uvas sobre las cartas impresas del bar",
-    tag: "Tabla",
+    alt: t.galleryPhotoDAlt,
+    tag: t.galleryPhotoDTag,
     ratio: "1 / 1",
     sizes: "(min-width: 62rem) 20rem, (min-width: 44rem) 48vw, 92vw",
   },
@@ -58,21 +66,20 @@ const blocks: GalleryBlock[] = [
     kind: "photo",
     slot: "e",
     image: berberechos,
-    alt: "Bol de patatas con mejillones aliñándose con una salsa desde un biberón de cocina",
-    tag: "Conserva",
+    alt: t.galleryPhotoEAlt,
+    tag: t.galleryPhotoETag,
     ratio: "2 / 3",
     sizes: "(min-width: 62rem) 20rem, (min-width: 44rem) 48vw, 92vw",
   },
- 
 ];
 
-const claimParts = site.claim.split(" · ");
+const claimParts = t.claim.split(" · ");
 ---
 
 <section class="gallery" id="galeria" aria-labelledby="galeria-titulo">
   <div class="gallery__head">
-    <p class="tag tag--brand">Álbum</p>
-    <h2 id="galeria-titulo">Lo que pasa<br />en la barra</h2>
+    <p class="tag tag--brand">{t.galleryTag}</p>
+    <h2 id="galeria-titulo">{t.galleryTitleBefore}<br />{t.galleryTitleAfter}</h2>
   </div>
 
   <div class="gallery__grid">
@@ -105,7 +112,7 @@ const claimParts = site.claim.split(" · ");
               ))}
             </ul>
             <p class="gallery__poster-note">
-              Fotografía directa, flash y nada de postureo. El álbum crece cada semana.
+              {t.galleryPosterNote}
             </p>
           </div>
         ),

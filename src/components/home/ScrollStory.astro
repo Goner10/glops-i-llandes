@@ -4,29 +4,31 @@ import { Image } from "astro:assets";
 import cocteles from "../../assets/images/gallery/cocteles - copia.jpg";
 import gilda from "../../assets/images/gallery/gilda2 - copia.jpg";
 import yayo from "../../assets/images/gallery/yayo - copia.jpg";
+import type { Locale } from "../../i18n/locale";
+import { ui } from "../../i18n/ui";
 
-/*
- * Las piezas fotográficas viven dentro de marcos (`.story__photo`) porque todavía
- * no hay recortes con transparencia. Cuando existan los WebP recortados, basta con
- * sustituir el contenido de cada `[data-story-piece]` por la imagen suelta y quitar
- * `.story__photo` de ese nodo: el guion de scroll anima el contenedor, no la imagen.
- */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
 
 const photos = [
   {
     image: cocteles,
-    alt: "Tres cócteles servidos en vaso corto y largo sostenidos con las dos manos",
-    label: "Cocktails",
+    alt: t.storyPhoto1Alt,
+    label: t.storyPhoto1Label,
   },
   {
     image: gilda,
-    alt: "Bandeja metálica con gildas de anchoa y encurtidos sobre cartas del bar",
-    label: "Conservas",
+    alt: t.storyPhoto2Alt,
+    label: t.storyPhoto2Label,
   },
   {
     image: yayo,
-    alt: "Cliente mayor con gafas de sol comiéndose una gilda en el bar",
-    label: "Amigos",
+    alt: t.storyPhoto3Alt,
+    label: t.storyPhoto3Label,
   },
 ];
 ---
@@ -37,7 +39,7 @@ const photos = [
       <p class="story__backdrop" aria-hidden="true">Glops</p>
 
       <div class="container story__inner">
-        <h2 class="story__title" id="story-titulo">De la barra<br />a la mesa</h2>
+        <h2 class="story__title" id="story-titulo">{t.storyTitleBefore}<br />{t.storyTitleAfter}</h2>
 
         <div class="story__pieces">
           {
@@ -57,7 +59,7 @@ const photos = [
 
          
 
-          <p class="story__piece stamp story__stamp" data-story-piece>Cabina abierta</p>
+          <p class="story__piece stamp story__stamp" data-story-piece>{t.storyStamp}</p>
         </div>
       </div>
     </div>

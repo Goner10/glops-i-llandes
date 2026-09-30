@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 
 import type { MenuCategory, MenuCategoryId } from "../../data/menu";
+import type { Locale } from "../../i18n/locale";
+import { interpolate, ui } from "../../i18n/ui";
 
 interface MenuFiltersProps {
+  locale: Locale;
   categories: readonly MenuCategory[];
   category: MenuCategoryId;
   resultCount: number;
@@ -31,6 +34,7 @@ function scrollChipIntoRail(scroller: HTMLElement, chip: HTMLElement): void {
 }
 
 export default function MenuFilters({
+  locale,
   categories,
   category,
   resultCount,
@@ -56,7 +60,7 @@ export default function MenuFilters({
         className="menu-filters__categories"
         ref={scrollerRef}
         role="group"
-        aria-label="Filtrar por categoría"
+        aria-label={ui(locale).filterCategories}
       >
         {categories.map((option) => (
           <button
@@ -81,7 +85,9 @@ export default function MenuFilters({
       </div>
 
       <p className="menu-filters__count" role="status">
-        {resultCount === 1 ? "1 producto" : `${resultCount} productos`}
+        {resultCount === 1
+          ? ui(locale).productCountOne
+          : interpolate(ui(locale).productCountMany, { n: resultCount })}
       </p>
     </div>
   );

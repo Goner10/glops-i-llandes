@@ -1,18 +1,16 @@
-import type { MenuProduct } from "../../data/menu";
+import type { Locale } from "../../i18n/locale";
+import type { LocalizedProduct } from "../../i18n/products";
 import { withBase } from "../../lib/paths";
 import AllergenList from "./AllergenList";
 import ProductPlaceholder from "./ProductPlaceholder";
 
 interface ProductCardProps {
-  product: MenuProduct;
-  onOpen: (product: MenuProduct, trigger: HTMLButtonElement) => void;
+  locale: Locale;
+  product: LocalizedProduct;
+  onOpen: (product: LocalizedProduct, trigger: HTMLButtonElement) => void;
 }
 
-/**
- * Ficha completa de un producto: un único marco negro envuelve la fotografía,
- * el nombre, el precio y los alérgenos. La descripción vive solo en el modal.
- */
-export default function ProductCard({ product, onOpen }: ProductCardProps) {
+export default function ProductCard({ locale, product, onOpen }: ProductCardProps) {
   return (
     <li className="product-card">
       <button
@@ -22,7 +20,7 @@ export default function ProductCard({ product, onOpen }: ProductCardProps) {
       >
         <span className="product-card__media">
           {product.image === null ? (
-            <ProductPlaceholder />
+            <ProductPlaceholder locale={locale} />
           ) : (
             <img
               className="product-card__image"
@@ -37,10 +35,9 @@ export default function ProductCard({ product, onOpen }: ProductCardProps) {
 
         <span className="product-card__body">
           <span className="product-card__name">{product.name}</span>
-          {/* Sin alérgenos el componente no pinta nada: la fila no reserva hueco. */}
           <span className="product-card__foot">
             <span className="product-card__price">{product.priceLabel}</span>
-            <AllergenList allergens={product.allergens} variant="card" />
+            <AllergenList locale={locale} allergens={product.allergens} variant="card" />
           </span>
         </span>
       </button>

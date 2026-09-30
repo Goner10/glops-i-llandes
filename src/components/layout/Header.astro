@@ -3,23 +3,32 @@ import { Image } from "astro:assets";
 
 import logoIconBlack from "../../assets/images/brand/logo-negro-solo.png";
 import logoIconWhite from "../../assets/images/brand/logo-blanco-solo.png";
-import logoTextBlack from "../../assets/images/brand/texto-negro.png";
-import logoTextWhite from "../../assets/images/brand/texto-blanco.png";
 import { site } from "../../config/site";
-import { withBase } from "../../lib/paths";
+import type { Locale } from "../../i18n/locale";
+import { getNavItems, pageHref, type PageId } from "../../i18n/routes";
+import { ui } from "../../i18n/ui";
 
 interface Props {
+  locale: Locale;
+  page: PageId;
   /** Remate bajo la barra: damero en la portada, doble filete en la carta. */
   strip?: "checker" | "rule";
   /**
-   * Home: el header móvil se superpone al hero y cambia de aspecto al salir de él.
-   * En páginas interiores el estado sólido (papel + wordmark negro) es el de partida.
+   * Home: el header se superpone al hero y cambia de aspecto al salir de él.
+   * En páginas interiores el estado sólido (papel + símbolo negro) es el de partida.
    */
   compact?: boolean;
 }
 
-const { strip = "checker", compact = false } = Astro.props;
+const { locale, page, strip = "checker", compact = false } = Astro.props;
 const overlaid = compact;
+const t = ui(locale);
+const nav = getNavItems(locale, {
+  carta: t.navCarta,
+  house: t.navHouse,
+  gallery: t.navGallery,
+  location: t.navLocation,
+});
 ---
 
 <header
@@ -28,48 +37,36 @@ const overlaid = compact;
   data-header-overlaid={overlaid ? "" : undefined}
 >
   <div class="bar">
-    <a class="brand" href={withBase("/")}>
-      <span class="visually-hidden">{site.name}, inicio</span>
+    <a class="brand" href={pageHref(locale, "home")}>
+      <span class="visually-hidden">{t.brandHome}</span>
       <span class="brand__slot" aria-hidden="true">
-        <Image
-          class="brand__full brand__full--white"
-          src={logoTextWhite}
-          alt=""
-          widths={[280, 440]}
-          sizes="(min-width: 62rem) 212px, 58vw"
-          loading="eager"
-        />
-        <Image
-          class="brand__full brand__full--black"
-          src={logoTextBlack}
-          alt=""
-          widths={[280, 440]}
-          sizes="(min-width: 62rem) 212px, 58vw"
-          loading="eager"
-        />
-        <Image
-          class="brand__icon brand__icon--white"
-          src={logoIconWhite}
-          alt=""
-          widths={[80, 120]}
-          sizes="40px"
-          loading="eager"
-        />
+        {
+          overlaid && (
+            <Image
+              class="brand__icon brand__icon--white"
+              src={logoIconWhite}
+              alt=""
+              widths={[80, 160]}
+              sizes="(min-width: 62rem) 3.2rem, 2.85rem"
+              loading="eager"
+            />
+          )
+        }
         <Image
           class="brand__icon brand__icon--black"
           src={logoIconBlack}
           alt=""
-          widths={[80, 120]}
-          sizes="40px"
+          widths={[80, 160]}
+          sizes="(min-width: 62rem) 3.2rem, 2.85rem"
           loading="eager"
         />
       </span>
     </a>
 
-    <nav class="nav-desktop" aria-label="Navegación principal">
+    <nav class="nav-desktop" aria-label={t.navMain}>
       <ul>
         {
-          site.nav.map((item) => (
+          nav.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
             </li>
@@ -80,19 +77,44 @@ const overlaid = compact;
 
     <div class="actions">
       <a class="phone" href={site.phone.href}>{site.phone.display}</a>
+      <nav class="lang" aria-label={t.langNav}>
+        <a
+          class="lang__link"
+          href={pageHref("es", page)}
+          lang="es"
+          hreflang="es"
+          aria-label={t.langToEs}
+          aria-current={locale === "es" ? "page" : undefined}
+        >
+          ES
+        </a>
+        <span class="lang__sep" aria-hidden="true">/</span>
+        <a
+          class="lang__link"
+          href={pageHref("en", page)}
+          lang="en"
+          hreflang="en"
+          aria-label={t.langToEn}
+          aria-current={locale === "en" ? "page" : undefined}
+        >
+          EN
+        </a>
+      </nav>
       <button
         class="burger"
         type="button"
         aria-expanded="false"
         aria-controls="menu-movil"
         data-menu-toggle
+        data-label-open={t.openMenu}
+        data-label-close={t.closeMenu}
       >
         <span class="burger__lines" aria-hidden="true">
           <span class="burger__line"></span>
           <span class="burger__line"></span>
           <span class="burger__line"></span>
         </span>
-        <span class="visually-hidden" data-menu-label>Abrir menú</span>
+        <span class="visually-hidden" data-menu-label>{t.openMenu}</span>
       </button>
     </div>
   </div>
@@ -101,10 +123,10 @@ const overlaid = compact;
   <div class="scrim" hidden data-menu-scrim aria-hidden="true"></div>
 
   <div class="panel" id="menu-movil" hidden data-menu-panel>
-    <nav aria-label="Navegación móvil">
+    <nav aria-label={t.navMobile}>
       <ul>
         {
-          site.nav.map((item) => (
+          nav.map((item) => (
             <li>
               <a href={item.href} data-menu-link>
                 {item.label}
@@ -115,7 +137,7 @@ const overlaid = compact;
       </ul>
     </nav>
     <a class="btn btn--brand panel__cta" href={site.phone.href}>
-      Llamar {site.phone.display}
+      {t.call} {site.phone.display}
     </a>
   </div>
 </header>
@@ -152,93 +174,54 @@ const overlaid = compact;
   }
 
   /*
-   * Hueco estable: en la home conserva el ancho del wordmark aunque se muestre
-   * solo el dibujo, para que no salten la nav ni el botón del menú.
+   * Hueco estable con la proporción de los muñequitos (3693×2506).
+   * En la home, sin compactar, el símbolo es un poco mayor; al compactar
+   * y en interiores encaja en la barra sin empujar el menú.
    */
   .brand__slot {
     position: relative;
     display: block;
-    width: 3.5rem;
+    flex-shrink: 0;
+    width: 3.54rem;
     height: 2.4rem;
+    overflow: hidden;
+    transition:
+      width 0.22s var(--ease-out),
+      height 0.22s var(--ease-out);
   }
 
-  .site-header--overlaid .brand__slot {
-    width: min(13.25rem, 58vw);
-    height: auto;
-    aspect-ratio: 4419 / 844;
+  .site-header--overlaid:not(.is-compacted) .brand__slot {
+    width: 4.2rem;
+    height: 2.85rem;
   }
 
-  .brand :global(.brand__full),
   .brand :global(.brand__icon) {
     position: absolute;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition:
-      opacity 0.22s var(--ease-out),
-      translate 0.22s var(--ease-out),
-      scale 0.22s var(--ease-out),
-      visibility 0.22s;
-  }
-
-  .brand :global(.brand__full) {
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
     object-position: left center;
-    scale: 0.96;
-    translate: 0 0.15rem;
-  }
-
-  .brand :global(.brand__icon) {
-    top: 50%;
-    left: 0;
-    width: auto;
-    height: 2.4rem;
-    scale: 0.92;
-    translate: 0 -40%;
-  }
-
-  /* Visible: carta/reservas y home compactada + papel. */
-  .site-header:not(.site-header--overlaid) .brand :global(.brand__icon--black),
-  .site-header--overlaid.is-compacted.is-solid .brand :global(.brand__icon--black),
-  .site-header--overlaid.is-compacted.is-menu-open .brand :global(.brand__icon--black) {
-    opacity: 1;
-    visibility: visible;
-    scale: 1;
-    translate: 0 -50%;
-  }
-
-  /* Home arriba del todo, sobre el vídeo. */
-  .site-header--overlaid:not(.is-compacted) .brand :global(.brand__full--white) {
-    opacity: 1;
-    visibility: visible;
-    scale: 1;
-    translate: 0;
-  }
-
-  /* Home arriba del todo con barra de papel (menú abierto). */
-  .site-header--overlaid:not(.is-compacted).is-solid .brand :global(.brand__full--white),
-  .site-header--overlaid:not(.is-compacted).is-menu-open .brand :global(.brand__full--white) {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s var(--ease-out),
+      visibility 0.22s;
   }
 
-  .site-header--overlaid:not(.is-compacted).is-solid .brand :global(.brand__full--black),
-  .site-header--overlaid:not(.is-compacted).is-menu-open .brand :global(.brand__full--black) {
+  /* Carta, reservas y cualquier barra de papel: símbolo negro. */
+  .site-header:not(.site-header--overlaid) .brand :global(.brand__icon--black),
+  .site-header--overlaid.is-solid .brand :global(.brand__icon--black),
+  .site-header--overlaid.is-menu-open .brand :global(.brand__icon--black) {
     opacity: 1;
     visibility: visible;
-    scale: 1;
-    translate: 0;
   }
 
-  /* Home scrolleada, todavía sobre el vídeo. */
-  .site-header--overlaid.is-compacted:not(.is-solid):not(.is-menu-open) .brand :global(.brand__icon--white) {
+  /* Home sobre el vídeo, menú cerrado: símbolo blanco. */
+  .site-header--overlaid:not(.is-solid):not(.is-menu-open) .brand :global(.brand__icon--white) {
     opacity: 1;
     visibility: visible;
-    scale: 1;
-    translate: 0 -50%;
   }
 
   .site-header--compact .bar {
@@ -278,7 +261,42 @@ const overlaid = compact;
   .actions {
     display: flex;
     align-items: center;
-    gap: var(--space-s);
+    gap: var(--space-2xs);
+  }
+
+  .lang {
+    display: flex;
+    align-items: center;
+    gap: 0.05rem;
+  }
+
+  .lang__link {
+    display: grid;
+    place-items: center;
+    min-width: 2.5rem;
+    min-height: 2.75rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: var(--radius-s);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .lang__link[aria-current="page"] {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.28em;
+    text-decoration-thickness: 2px;
+  }
+
+  .lang__sep {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    opacity: 0.55;
   }
 
   .phone {
@@ -461,6 +479,18 @@ const overlaid = compact;
     background: var(--color-paper);
   }
 
+  .site-header--overlaid .lang__link,
+  .site-header--overlaid .lang__sep {
+    color: var(--color-paper);
+  }
+
+  .site-header--overlaid.is-solid .lang__link,
+  .site-header--overlaid.is-solid .lang__sep,
+  .site-header--overlaid.is-menu-open .lang__link,
+  .site-header--overlaid.is-menu-open .lang__sep {
+    color: var(--color-black);
+  }
+
   /* Móvil: hamburguesa clara sobre el vídeo. */
   @media (max-width: 61.99rem) {
     .site-header--overlaid .burger {
@@ -510,7 +540,9 @@ const overlaid = compact;
     }
 
     .site-header--overlaid .nav-desktop a,
-    .site-header--overlaid .phone {
+    .site-header--overlaid .phone,
+    .site-header--overlaid .lang__link,
+    .site-header--overlaid .lang__sep {
       color: var(--color-paper);
     }
 
@@ -522,7 +554,11 @@ const overlaid = compact;
     }
 
     .site-header--overlaid.is-solid .nav-desktop a,
-    .site-header--overlaid.is-solid .phone {
+    .site-header--overlaid.is-solid .phone,
+    .site-header--overlaid.is-solid .lang__link,
+    .site-header--overlaid.is-solid .lang__sep,
+    .site-header--overlaid.is-menu-open .lang__link,
+    .site-header--overlaid.is-menu-open .lang__sep {
       color: inherit;
     }
   }
@@ -533,7 +569,7 @@ const overlaid = compact;
     }
 
     .site-header--overlaid .bar,
-    .brand :global(.brand__full),
+    .brand__slot,
     .brand :global(.brand__icon) {
       transition: none;
     }
@@ -551,6 +587,8 @@ const overlaid = compact;
     const panel = header.querySelector<HTMLElement>("[data-menu-panel]");
     const scrim = header.querySelector<HTMLElement>("[data-menu-scrim]");
     const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
+    const openLabel = toggle?.dataset.labelOpen ?? "Abrir menú";
+    const closeLabel = toggle?.dataset.labelClose ?? "Cerrar menú";
     const overlaid = header.hasAttribute("data-header-overlaid");
     const desktop = window.matchMedia("(min-width: 62rem)");
     const hero = document.querySelector<HTMLElement>("[data-hero]");
@@ -584,7 +622,7 @@ const overlaid = compact;
     };
 
     /**
-     * Compacta al primer scroll y solo recupera el wordmark cerca de 0, con
+     * Compacta el símbolo al primer scroll y solo lo agranda cerca de 0, con
      * holgura para que 1–2 px no hagan oscilar el estado.
      */
     const applyCompact = () => {
@@ -600,7 +638,7 @@ const overlaid = compact;
       toggle.setAttribute("aria-expanded", String(open));
       panel.hidden = !open;
       if (scrim) scrim.hidden = !open;
-      if (label) label.textContent = open ? "Cerrar menú" : "Abrir menú";
+      if (label) label.textContent = open ? closeLabel : openLabel;
       header.classList.toggle("is-menu-open", open);
       applyAppearance();
     };

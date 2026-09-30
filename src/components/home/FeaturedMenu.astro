@@ -1,25 +1,35 @@
 ---
-import { featuredProducts, getCategoryLabel } from "../../data/menu";
-import { withBase } from "../../lib/paths";
+import { featuredProducts } from "../../data/menu";
+import type { Locale } from "../../i18n/locale";
+import { categoryLabel, localizeProduct } from "../../i18n/products";
+import { pageHref } from "../../i18n/routes";
+import { ui } from "../../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
+const items = featuredProducts.map((product) => localizeProduct(product, locale));
 ---
 
 <section class="featured" id="carta" aria-labelledby="carta-titulo">
   <div class="container featured__inner">
     <div class="featured__head">
-      <p class="eyebrow featured__eyebrow">De la carta</p>
-      <h2 id="carta-titulo">Cuatro<br />razones</h2>
+      <p class="eyebrow featured__eyebrow">{t.featuredEyebrow}</p>
+      <h2 id="carta-titulo">{t.featuredTitleBefore}<br />{t.featuredTitleAfter}</h2>
       <p class="featured__note">
-        Una muestra corta de nuestra carta.
+        {t.featuredNote}
       </p>
-      <a class="btn btn--brand featured__cta" href={withBase("/carta")}>Ver la carta completa</a>
-      
+      <a class="btn btn--brand featured__cta" href={pageHref(locale, "carta")}>{t.featuredCta}</a>
     </div>
 
     <ul class="featured__list">
       {
-        featuredProducts.map((product) => (
+        items.map((product) => (
           <li class="featured__row" data-reveal>
-            <span class="featured__cat">{getCategoryLabel(product.category)}</span>
+            <span class="featured__cat">{categoryLabel(product.category, locale)}</span>
             <span class="featured__name">{product.name}</span>
             <span class="featured__dots" aria-hidden="true" />
             <span class="featured__price">{product.priceLabel}</span>
