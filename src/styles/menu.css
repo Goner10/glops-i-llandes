@@ -3,6 +3,7 @@
 .menu-explorer {
   display: grid;
   gap: var(--space-l);
+  min-width: 0;
 }
 
 /* Filtros */
@@ -10,6 +11,7 @@
 .menu-filters {
   display: grid;
   gap: var(--space-s);
+  min-width: 0;
   padding-bottom: var(--space-s);
   /* Doble filete fino en lugar del damero. */
   border-bottom: 3px double var(--color-black);
@@ -18,13 +20,15 @@
 /*
  * Carril horizontal de categorías. En móvil sangra hasta el borde de la
  * pantalla para que la primera y la última no queden pegadas al viewport; el
- * `overflow` propio impide que ese sangrado desborde la página.
+ * `overflow` propio impide que ese sangrado desborde la página. En cualquier
+ * viewport, si los chips no caben, el desbordamiento queda dentro del carril.
  */
 .menu-filters__categories {
   position: relative;
   display: flex;
   flex-wrap: nowrap;
   gap: var(--space-2xs);
+  min-width: 0;
   margin-inline: calc(var(--gutter) * -1);
   padding-inline: var(--gutter);
   /* Hueco para que el anillo de foco no se recorte contra el borde del carril. */
@@ -34,11 +38,31 @@
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-padding-inline: var(--gutter);
-  scrollbar-width: none;
 }
 
-.menu-filters__categories::-webkit-scrollbar {
-  display: none;
+@media (hover: hover) and (pointer: fine) {
+  .menu-filters__categories {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a46 transparent;
+    padding-bottom: 0.75rem;
+  }
+
+  .menu-filters__categories::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .menu-filters__categories::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .menu-filters__categories::-webkit-scrollbar-thumb {
+    background: #4a4a46;
+    border-radius: var(--radius-pill);
+  }
+
+  .menu-filters__categories::-webkit-scrollbar-thumb:hover {
+    background: var(--color-black);
+  }
 }
 
 .menu-filters__chip {
@@ -78,15 +102,20 @@
 
 @media (min-width: 48rem) {
   .menu-filters {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     column-gap: var(--space-m);
   }
 
-  /* En escritorio caben en una línea y no hace falta el sangrado del carril. */
+  /* Sin sangrado a los bordes de la pantalla; el carril sigue pudiendo hacer scroll. */
   .menu-filters__categories {
     margin-inline: 0;
     padding-inline: 0;
+    scroll-padding-inline: 0.5rem;
+  }
+
+  .menu-filters__count {
+    min-width: max-content;
   }
 }
 
@@ -437,5 +466,113 @@
 
   .product-ph .product-ph__stamp {
     rotate: none;
+  }
+}
+
+/* Lista de vinos: grupos abiertos, sin fichas ni modal. */
+
+.wine-list {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.wine-group {
+  display: grid;
+  gap: var(--space-s);
+}
+
+.wine-group__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.wine-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.wine-table th,
+.wine-table td {
+  padding: 0.85rem 0;
+  vertical-align: top;
+  text-align: left;
+}
+
+.wine-table thead th {
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--color-black);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4a4a46;
+}
+
+.wine-table tbody th,
+.wine-table tbody td {
+  border-bottom: 1px solid #d8d5cd;
+  font-weight: 400;
+}
+
+.wine-table tbody tr:last-child th,
+.wine-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wine-table__wine {
+  width: auto;
+  padding-right: var(--space-s);
+}
+
+.wine-table__name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 0.72rem + 1vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.wine-table__meta,
+.wine-table__notes {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+.wine-table__notes {
+  color: #4a4a46;
+}
+
+.wine-table__price {
+  width: 5.1rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-s);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wine-table thead .wine-table__price {
+  font-weight: 600;
+}
+
+@media (min-width: 48rem) {
+  .wine-table__price {
+    width: 6.5rem;
   }
 }

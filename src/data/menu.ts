@@ -1,6 +1,8 @@
 import type { AllergenId } from './allergens';
+import { wineProducts } from './wines';
 
-export type MenuCategoryId =
+/** Categorías de comida y cócteles: el campo `category` de cada MenuProduct. */
+export type ProductCategoryId =
   | 'aperitivos'
   | 'tablas'
   | 'compartir'
@@ -10,6 +12,9 @@ export type MenuCategoryId =
   | 'postres'
   | 'cocteles';
 
+/** Categorías de la navegación de la carta, incluido Vinos. */
+export type MenuCategoryId = ProductCategoryId | 'vinos';
+
 export interface MenuCategory {
   readonly id: MenuCategoryId;
   readonly label: string;
@@ -18,7 +23,7 @@ export interface MenuCategory {
 export interface MenuProduct {
   readonly id: string;
   readonly name: string;
-  readonly category: MenuCategoryId;
+  readonly category: ProductCategoryId;
   /** Precio en euros, para ordenar o comparar. */
   readonly price: number;
   /** Precio ya formateado tal y como debe leerse en la web. */
@@ -51,6 +56,7 @@ export const menuCategories: readonly MenuCategory[] = [
   { id: 'extras', label: 'Extras' },
   { id: 'postres', label: 'Postres' },
   { id: 'cocteles', label: 'Cócteles' },
+  { id: 'vinos', label: 'Vinos' },
 ];
 
 export const menuProducts: readonly MenuProduct[] = [
@@ -82,7 +88,7 @@ export const menuProducts: readonly MenuProduct[] = [
     category: 'aperitivos',
     price: 3,
     priceLabel: '3 €',
-    image: null,
+    image: '/images/products/gilda-cecina-queso.png',
     imageAlt: null,
     allergens: ['lacteos'],
     description: null,
@@ -93,8 +99,8 @@ export const menuProducts: readonly MenuProduct[] = [
     category: 'aperitivos',
     price: 3.5,
     priceLabel: '3,50 €',
-    image: null,
-    imageAlt: null,
+    image: '/images/products/gilda-arenque.png',
+    imageAlt: 'Gilda arenque con aceitunas y guindillas',
     allergens: ['pescado'],
     description: null,
   },
@@ -293,8 +299,8 @@ export const menuProducts: readonly MenuProduct[] = [
     category: 'compartir',
     price: 9.8,
     priceLabel: '9,80 €',
-    image: null,
-    imageAlt: null,
+    image: '/images/products/ensaladilla-marisco.png',
+    imageAlt: 'Ensaladilla de marisco con ventresca y encurtidos',
     allergens: ['gluten', 'pescado', 'huevos', 'crustaceos'],
     description: 'Con ventresca y encurtidos.',
   },
@@ -814,9 +820,10 @@ export const menuProducts: readonly MenuProduct[] = [
   },
 ];
 
-export const availableCategories: readonly MenuCategory[] = menuCategories.filter((category) =>
-  menuProducts.some((product) => product.category === category.id),
-);
+export const availableCategories: readonly MenuCategory[] = menuCategories.filter((category) => {
+  if (category.id === 'vinos') return wineProducts.length > 0;
+  return menuProducts.some((product) => product.category === category.id);
+});
 
 /** Productos que se enseñan en la portada, sin montar la carta completa. */
 export const featuredProductIds: readonly string[] = [
@@ -834,6 +841,10 @@ export function getCategoryLabel(id: MenuCategoryId): string {
   return menuCategories.find((category) => category.id === id)?.label ?? id;
 }
 
-export function getProductsByCategory(id: MenuCategoryId): readonly MenuProduct[] {
+export function isProductCategory(id: MenuCategoryId): id is ProductCategoryId {
+  return id !== 'vinos';
+}
+
+export function getProductsByCategory(id: ProductCategoryId): readonly MenuProduct[] {
   return menuProducts.filter((product) => product.category === id);
 }

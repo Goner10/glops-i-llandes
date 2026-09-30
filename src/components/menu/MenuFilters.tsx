@@ -12,6 +12,24 @@ interface MenuFiltersProps {
 /** Holgura que se deja a los lados al acercar una categoría al centro del carril. */
 const SCROLL_INSET = 24;
 
+function scrollChipIntoRail(scroller: HTMLElement, chip: HTMLElement): void {
+  const start = chip.offsetLeft - SCROLL_INSET;
+  const end = chip.offsetLeft + chip.offsetWidth + SCROLL_INSET;
+  const viewStart = scroller.scrollLeft;
+  const viewEnd = viewStart + scroller.clientWidth;
+
+  let left = viewStart;
+  if (start < viewStart) left = start;
+  else if (end > viewEnd) left = end - scroller.clientWidth;
+  else return;
+
+  const maxLeft = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+  left = Math.min(Math.max(0, left), maxLeft);
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  scroller.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
+}
+
 export default function MenuFilters({
   categories,
   category,
@@ -29,18 +47,7 @@ export default function MenuFilters({
     const chip = chipsRef.current.get(category);
     if (scroller === null || chip === undefined) return;
 
-    const start = chip.offsetLeft - SCROLL_INSET;
-    const end = chip.offsetLeft + chip.offsetWidth + SCROLL_INSET;
-    const viewStart = scroller.scrollLeft;
-    const viewEnd = viewStart + scroller.clientWidth;
-
-    let left = viewStart;
-    if (start < viewStart) left = start;
-    else if (end > viewEnd) left = end - scroller.clientWidth;
-    else return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    scroller.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
+    scrollChipIntoRail(scroller, chip);
   }, [category]);
 
   return (
@@ -62,6 +69,11 @@ export default function MenuFilters({
               else chipsRef.current.set(option.id, node);
             }}
             onClick={() => onCategoryChange(option.id)}
+            onFocus={(event) => {
+              const scroller = scrollerRef.current;
+              if (scroller === null) return;
+              scrollChipIntoRail(scroller, event.currentTarget);
+            }}
           >
             {option.label}
           </button>

@@ -3,15 +3,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   availableCategories,
   getProductsByCategory,
+  isProductCategory,
   type MenuCategoryId,
   type MenuProduct,
 } from "../../data/menu";
+import { wineProducts } from "../../data/wines";
 import MenuFilters from "./MenuFilters";
 import ProductGrid from "./ProductGrid";
 import ProductModal from "./ProductModal";
+import WineList from "./WineList";
 import "../../styles/menu.css";
 
-// La carta arranca en la primera categoría con producto, sin depender de ningún
+// La carta arranca en la primera categoría con contenido, sin depender de ningún
 // identificador escrito a mano.
 const initialCategory: MenuCategoryId = availableCategories[0].id;
 
@@ -22,10 +25,14 @@ export default function MenuExplorer() {
   // El disparador no es estado: solo hace falta para devolverle el foco al cerrar.
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
+  const showingWines = category === "vinos";
+
   const visibleProducts = useMemo<readonly MenuProduct[]>(
-    () => getProductsByCategory(category),
+    () => (isProductCategory(category) ? getProductsByCategory(category) : []),
     [category],
   );
+
+  const resultCount = showingWines ? wineProducts.length : visibleProducts.length;
 
   // El foco se devuelve una vez el modal ya ha salido del DOM, para que el
   // cierre del <dialog> no se lo lleve de vuelta al documento.
@@ -48,16 +55,21 @@ export default function MenuExplorer() {
     setSelectedProduct(null);
   };
 
+  const changeCategory = (next: MenuCategoryId): void => {
+    setSelectedProduct(null);
+    setCategory(next);
+  };
+
   return (
     <div className="menu-explorer">
       <MenuFilters
         categories={availableCategories}
         category={category}
-        resultCount={visibleProducts.length}
-        onCategoryChange={setCategory}
+        resultCount={resultCount}
+        onCategoryChange={changeCategory}
       />
 
-      <ProductGrid products={visibleProducts} onOpen={openProduct} />
+      {showingWines ? <WineList /> : <ProductGrid products={visibleProducts} onOpen={openProduct} />}
 
       <ProductModal product={selectedProduct} onClose={closeProduct} />
     </div>
